@@ -7,7 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
   
   <style>
     body {
@@ -23,7 +23,7 @@
     }
 
     .perspective-1000 {
-      perspective: 1000px;
+      perspective: 1200px;
     }
 
     .transform-style-3d {
@@ -61,7 +61,7 @@
       letter-spacing: 0.35em;
     }
 
-    /* The Survivor: "What was not captured" holds crisp legibility through 12s, fading only in the final seconds */
+    /* The Survivor: "What was not captured" holds legibility through 15s */
     .field-value-survivor {
       transition: filter 15s cubic-bezier(0.85, 0, 0.95, 1),
                   opacity 15s cubic-bezier(0.85, 0, 0.95, 1),
@@ -69,16 +69,16 @@
     }
 
     .is-decayed .field-value-survivor {
-      filter: blur(5px);
-      opacity: 0.18;
-      letter-spacing: 0.22em;
+      filter: blur(4px);
+      opacity: 0.22;
+      letter-spacing: 0.18em;
     }
 
     .instant-reset .field-value {
       transition: none !important;
     }
 
-    /* Audio styling inside cards */
+    /* Custom audio control aesthetics */
     audio::-webkit-media-controls-panel {
       background-color: #0f172a;
     }
@@ -93,49 +93,48 @@
       height: 6px;
     }
     ::-webkit-scrollbar-track {
-      background: #f1f5f9;
+      background: #0f172a;
     }
     ::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 3px;
+      background: #334155;
+      border-radius: 4px;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: #94a3b8;
+      background: #f59e0b;
     }
   </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col selection:bg-amber-200 selection:text-slate-900">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-amber-400 selection:text-slate-950">
 
-  <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur-md sticky top-0 z-30">
+  <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur-md sticky top-0 z-30 shadow-md">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
       <div class="flex items-center gap-3">
-        <div id="totalBadge" class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-mono text-sm font-bold shadow-inner">
-          --
+        <div id="totalBadge" class="w-11 h-11 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-mono text-base font-bold shadow-inner">
+          20
         </div>
         <div>
           <h1 class="text-lg font-bold text-slate-100 tracking-tight flex items-center gap-2">
             ARCHIVAL REPOSITORY
             <span id="collectionTitle" class="text-xs px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 font-mono font-normal">ARTT3005</span>
           </h1>
-          <p id="statsSubtitle" class="text-xs text-slate-400">Loading catalog items...</p>
+          <p id="statsSubtitle" class="text-xs text-slate-400">20 Total Specimens • 15 Images • 3 Audio • 2 Text</p>
         </div>
       </div>
 
-      <!-- Filter Tabs & Search Bar -->
       <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
-        <div class="relative flex-1 md:w-56">
-          <input type="text" id="searchInput" oninput="filterRecords()" placeholder="Search catalog..." class="w-full bg-slate-900 border border-slate-800 rounded-lg text-xs px-3 py-2 pl-8 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500/50 transition-colors">
+        <div class="relative flex-1 md:w-60">
+          <input type="text" id="searchInput" oninput="filterRecords()" placeholder="Search catalog, tag, place..." class="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 pl-8 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500/60 transition-colors">
           <svg class="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
         </div>
 
-        <div class="flex items-center bg-slate-900 p-1 rounded-lg border border-slate-800 text-xs font-medium">
-          <button onclick="setCategoryFilter('all')" id="btnFilterAll" class="px-2.5 py-1 rounded-md text-amber-400 bg-slate-800 transition-all">All</button>
-          <button onclick="setCategoryFilter('image')" id="btnFilterImage" class="px-2.5 py-1 rounded-md text-slate-400 hover:text-slate-200 transition-all">Image</button>
-          <button onclick="setCategoryFilter('sound')" id="btnFilterSound" class="px-2.5 py-1 rounded-md text-slate-400 hover:text-slate-200 transition-all">Sound</button>
-          <button onclick="setCategoryFilter('text')" id="btnFilterText" class="px-2.5 py-1 rounded-md text-slate-400 hover:text-slate-200 transition-all">Text</button>
+        <div class="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-medium">
+          <button onclick="setCategoryFilter('all')" id="btnFilterAll" class="px-3 py-1 rounded-lg text-amber-400 bg-slate-800 transition-all">All (20)</button>
+          <button onclick="setCategoryFilter('image')" id="btnFilterImage" class="px-3 py-1 rounded-lg text-slate-400 hover:text-slate-200 transition-all">Image (15)</button>
+          <button onclick="setCategoryFilter('sound')" id="btnFilterSound" class="px-3 py-1 rounded-lg text-slate-400 hover:text-slate-200 transition-all">Sound (3)</button>
+          <button onclick="setCategoryFilter('text')" id="btnFilterText" class="px-3 py-1 rounded-lg text-slate-400 hover:text-slate-200 transition-all">Text (2)</button>
         </div>
 
-        <button onclick="fetchRecordsData(true)" title="Sync records.json" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-mono transition-all active:scale-95 cursor-pointer">
+        <button onclick="fetchRecordsData(true)" title="Sync records dataset" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-mono transition-all active:scale-95 cursor-pointer">
           <svg id="syncIcon" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
           <span id="syncText">Sync</span>
         </button>
@@ -145,30 +144,29 @@
 
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div id="recordsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      <!-- Dynamically populated via JavaScript -->
+      <!-- Injected dynamically via JavaScript -->
     </div>
   </main>
 
-  <div id="modalOverlay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4">
+  <div id="modalOverlay" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4">
     <div class="relative w-full max-w-[480px] flex flex-col items-center">
       
       <!-- Close Button -->
-      <button onclick="closeModal()" class="absolute -top-12 right-0 md:-right-10 text-slate-400 hover:text-white p-2 rounded-full hover:bg-slate-800 transition-colors cursor-pointer">
+      <button onclick="closeModal()" class="absolute -top-12 right-0 md:-right-10 text-slate-400 hover:text-white p-2 rounded-full hover:bg-slate-800 transition-colors cursor-pointer" title="Close modal (Esc)">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
       </button>
 
-      <!-- 3D Flippable Card Stage -->
       <div class="perspective-1000 w-full max-w-[460px] h-[580px]">
         
         <div id="cardInner" class="relative w-full h-full transition-transform duration-700 transform-style-3d rounded-2xl shadow-2xl">
           
           <!-- FRONT FACE -->
-          <div id="cardFront" class="absolute inset-0 w-full h-full bg-slate-900 rounded-2xl border border-slate-700/60 p-6 flex flex-col justify-between backface-hidden text-slate-100 shadow-xl overflow-hidden">
+          <div id="cardFront" class="absolute inset-0 w-full h-full bg-slate-900 rounded-2xl border border-slate-700/70 p-6 flex flex-col justify-between backface-hidden text-slate-100 shadow-2xl overflow-hidden">
             
             <div class="flex flex-col gap-4 h-full">
               <!-- Top Badge / Header -->
-              <div class="flex items-center justify-between shrink-0 border-b border-slate-800 pb-2">
-                <span id="valFrontBadge" class="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded bg-slate-800 text-amber-400 border border-slate-700">IMAGE SPECIMEN</span>
+              <div class="flex items-center justify-between shrink-0 border-b border-slate-800 pb-2.5">
+                <span id="valFrontBadge" class="text-[10px] font-mono uppercase tracking-widest px-2.5 py-1 rounded-md bg-slate-800 text-amber-400 border border-slate-700 font-bold">IMAGE SPECIMEN</span>
                 <span id="valFrontCatalog" class="text-xs font-mono text-slate-400">REC-001</span>
               </div>
 
@@ -178,12 +176,12 @@
               </div>
 
               <!-- Title & Location -->
-              <div class="space-y-1 px-1 flex-1 overflow-y-auto">
-                <h2 id="valFrontTitle" class="text-lg font-bold text-white tracking-tight leading-snug">
+              <div class="space-y-1.5 px-1 flex-1 overflow-y-auto">
+                <h2 id="valFrontTitle" class="text-base font-bold text-white tracking-tight leading-snug">
                   Loading Title...
                 </h2>
                 <p id="valFrontPlace" class="text-xs text-slate-400 font-normal leading-relaxed flex items-center gap-1.5">
-                  <svg class="w-3.5 h-3.5 text-amber-400/80 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                  <svg class="w-3.5 h-3.5 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                   <span id="valFrontPlaceText">Loading Location...</span>
                 </p>
                 <p id="valFrontDate" class="text-[11px] text-slate-500 font-mono">Date: --</p>
@@ -198,14 +196,14 @@
 
           </div>
 
-          <!-- BACK FACE (ARCHIVAL SPECIMEN LABEL) -->
-          <div id="cardBack" class="absolute inset-0 w-full h-full bg-amber-50/95 rounded-2xl border border-slate-300 p-6 flex flex-col justify-between backface-hidden rotate-y-180 font-mono-specimen text-slate-900 shadow-xl">
+          <!-- BACK FACE (DECISION / ARCHIVAL SPECIMEN LABEL) -->
+          <div id="cardBack" class="absolute inset-0 w-full h-full bg-amber-50 rounded-2xl border border-amber-200/80 p-6 flex flex-col justify-between backface-hidden rotate-y-180 font-mono-specimen text-slate-900 shadow-2xl">
             
-            <div class="flex-1 flex flex-col justify-between border-2 border-slate-800 rounded-lg p-4 bg-amber-50/40 shadow-sm relative overflow-hidden">
+            <div class="flex-1 flex flex-col justify-between border-2 border-slate-800 rounded-lg p-4 bg-amber-50/70 shadow-sm relative overflow-hidden">
               
               <div class="border-b-2 border-slate-800 pb-2 mb-2 flex items-center justify-between shrink-0">
-                <span class="text-[10px] font-bold uppercase tracking-widest text-slate-600 select-none">Specimen Label</span>
-                <span id="valCatalog" class="text-xs font-bold tracking-wider text-slate-900 bg-amber-100/80 border border-slate-700 px-2 py-0.5 rounded shadow-none select-none">REC-001</span>
+                <span class="text-[10px] font-bold uppercase tracking-widest text-slate-700 select-none">Specimen Label</span>
+                <span id="valCatalog" class="text-xs font-bold tracking-wider text-slate-900 bg-amber-200/80 border border-slate-800 px-2 py-0.5 rounded shadow-none select-none">REC-001</span>
               </div>
 
               <div class="space-y-2 text-xs flex-1 flex flex-col justify-between overflow-y-auto pr-1">
@@ -225,8 +223,8 @@
                   <p id="valRecorder" class="field-value field-value-standard text-slate-800 truncate">...</p>
                 </div>
 
-                <div class="flex-1 min-h-[90px] bg-amber-100/40 p-2.5 rounded border border-slate-300/60 overflow-y-auto">
-                  <span class="block text-[9px] font-bold uppercase tracking-wider text-amber-900/80 mb-1 select-none sticky top-0 bg-amber-50/80 backdrop-blur-sm">What was not captured</span>
+                <div class="flex-1 min-h-[95px] bg-amber-100/50 p-2.5 rounded border border-slate-300/80 overflow-y-auto">
+                  <span class="block text-[9px] font-bold uppercase tracking-wider text-amber-950 mb-1 select-none sticky top-0 bg-amber-50/90 backdrop-blur-sm py-0.5">What was not captured</span>
                   <p id="valNotCaptured" class="field-value field-value-survivor text-slate-900 text-[11px] leading-relaxed italic font-medium whitespace-pre-wrap">
                     ...
                   </p>
@@ -234,14 +232,14 @@
 
               </div>
 
-              <div class="mt-2 pt-2 border-t border-slate-400 flex items-center justify-between text-[9px] text-slate-600 uppercase tracking-widest shrink-0 select-none">
+              <div class="mt-2 pt-2 border-t border-slate-400 flex items-center justify-between text-[9px] text-slate-700 uppercase tracking-widest shrink-0 select-none font-semibold">
                 <span id="valCertainty">Certainty: --</span>
                 <span>Archival Div.</span>
               </div>
 
             </div>
 
-            <button onclick="flipCard()" class="w-full mt-3 py-2.5 px-4 bg-slate-900 hover:bg-slate-800 text-amber-400 text-xs font-bold uppercase tracking-wider rounded-xl transition-all duration-200 flex items-center justify-center gap-2 group shrink-0 cursor-pointer">
+            <button onclick="flipCard()" class="w-full mt-3 py-2.5 px-4 bg-slate-950 hover:bg-slate-800 text-amber-400 text-xs font-bold uppercase tracking-wider rounded-xl transition-all duration-200 flex items-center justify-center gap-2 group shrink-0 cursor-pointer">
               <svg class="w-4 h-4 text-amber-400 group-hover:-rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
               <span>Return to Front</span>
             </button>
@@ -256,24 +254,55 @@
   </div>
 
   <script>
+    // Embedded dataset with all 20 records (15 Images, 3 Sounds, 2 Text)
+    // REC-006, REC-015, REC-018 are explicitly set as "image" type
+    const defaultEmbeddedData = [
+      { id: "REC-001", title: "Table of grilled meat that triggered my diarrheal response", type: "image", file: "media/image.jpg", date: "2026-07-04", place: "Korean BBQ Restaurant", recorder: "Queenie", not_captured: "This photo shows the food, but you can't feel how greasy it tasted and the bad stomach cramps that came later.", certainty: 4 },
+      { id: "REC-002", title: "Dairy drinks that triggered my diarrheal response", type: "image", file: "media/image1.jpg", date: "2026-09-12", place: "7-11 shop", recorder: "Queenie", not_captured: "The picture shows the fridge full of dairy, yet it misses the cold creamy taste and how sorry I felt after drinking.", certainty: 4 },
+      { id: "REC-003", title: "Diarrhoea", type: "sound", file: "media/Pum.mp3", date: "2026-08-12", place: "Toilet in the shopping mall", recorder: "Queenie", not_captured: "odor of feces", certainty: 3 },
+      { id: "REC-004", title: "Grilled skewers before my diarrheal response kicked in", type: "image", file: "media/image2.jpeg", date: "2026-08-12", place: "大尾督嘉年華燒烤 BBQ Party", recorder: "Queenie", not_captured: "You see the grilled food here, but not the oily flavour and my slowly aching stomach.", certainty: 3 },
+      { id: "REC-005", title: "Reflection", type: "text", file: "media/regret.txt", date: "2026-08-12", place: "my aunt's flat", recorder: "Queenie", not_captured: "her tone. I have written the words but not the way she said them.", certainty: 2 },
+      { id: "REC-006", title: "Buy medicine", type: "image", file: "media/image3.jpg", date: "2026-08-30", place: "廣溢中西藥行有限公司", recorder: "Queenie", not_captured: "It's just a photo of the shop front. It cannot show my sharp stomach pain and how worried I was.", certainty: 4 },
+      { id: "REC-007", title: "Sushi and receipt that led to my diarrheal response", type: "image", file: "media/image4.jpg", date: "2026-09-12", place: "Sushi Express", recorder: "Queenie", not_captured: "I captured the sushi and receipt, but the raw‑fish texture and painful gut trouble are totally lost.", certainty: 4 },
+      { id: "REC-008", title: "Stoma che", type: "sound", file: "media/Cartoon stomach growling sfx.mp3", date: "2026-08-12", place: "my aunt's flat", recorder: "Queenie", not_captured: "the smell, and how hot the room was", certainty: 3 },
+      { id: "REC-009", title: "Yogurt and milk I drank before my diarrheal response", type: "image", file: "media/image5.jpg", date: "2024-04-12", place: "At home", recorder: "Queenie", not_captured: "The image shows these dairy bottles, but you cannot taste their thick texture or feel my stomach reacting badly.", certainty: 3 },
+      { id: "REC-010", title: "Reflection", type: "text", file: "media/reflection.txt", date: "2026-08-12", place: "my aunt's flat", recorder: "Queenie", not_captured: "her tone. I have written the words but not the way she said them.", certainty: 2 },
+      { id: "REC-011", title: "Store shelf-digestive pills for my diarrheal response", type: "image", file: "media/image6.jpg", date: "2026-09-02", place: "Convenience-store medicine shelf", recorder: "Queenie", not_captured: "The pill boxes are in view, but my ongoing stomach cramping and personal regret cannot be photographed.", certainty: 4 },
+      { id: "REC-012", title: "Restroom sign when my diarrheal response hit", type: "image", file: "media/image7.jpg", date: "2026-09-03", place: "Toilet in MTR station", recorder: "Queenie", not_captured: "This is only a restroom sign. It can'record how panicked I was and how badly I needed the toilet.", certainty: 4 },
+      { id: "REC-013", title: "Eating", type: "sound", file: "media/badger eating peanuts.mp3", date: "2026-08-12", place: "In the restaurant", recorder: "Queenie", not_captured: "the smell, and how hot the room was", certainty: 3 },
+      { id: "REC-014", title: "Bin with used tissue after my diarrheal response", type: "image", file: "media/image8.jpeg", date: "2026-09-03", place: "Toilet in MTR station", recorder: "Queenie", not_captured: "The bin and tissue are visible, yet the bad odour and my physical tiredness cannot be caught in a photo.", certainty: 3 },
+      { id: "REC-015", title: "Reflection", type: "image", file: "media/image14.jpg", date: "2026-08-12", place: "my aunt's flat", recorder: "Queenie", not_captured: "her tone. I have written the words but not the way she said them.", certainty: 2 },
+      { id: "REC-016", title: "Medicine I took to ease my diarrheal response", type: "image", file: "media/image9.jpg", date: "2026-10-12", place: "At home", recorder: "Queenie", not_captured: "I photographed the medicine packaging, but the dull leftover ache inside my belly is missing from this record.", certainty: 4 },
+      { id: "REC-017", title: "Toilet when my diarrheal response hit hard", type: "image", file: "media/image10.jpg", date: "2026-01-01", place: "Shopping mall", recorder: "Queenie", not_captured: "The photo only shows the toilet bowl. It can't capture how urgent I felt and the painful stomach cramps.", certainty: 4 },
+      { id: "REC-018", title: "Supplies I needed during my diarrheal response", type: "image", file: "media/image11.jpg", date: "2026-08-12", place: "At home", recorder: "Queenie", not_captured: "You can see the roll of toilet paper here, but it doesn't show how often I had to reach for it.", certainty: 3 },
+      { id: "REC-019", title: "This heavy spicy meal triggered my diarrheal response", type: "image", file: "media/image12.jpg", date: "2026-09-06", place: "Sichuan hot pot restaurant", recorder: "Queenie", not_captured: "The picture shows the boiling spicy fish pot, but you can't taste the super spicy oil that upset my gut.", certainty: 3 },
+      { id: "REC-020", title: "Iced fruit drinks before my diarrheal response started", type: "image", file: "media/image13.jpg", date: "2026-08-12", place: "Heytea store", recorder: "Queenie", not_captured: "These cold drinks look nice in the photo, but it misses how my stomach reacted after drinking them.", certainty: 2 }
+    ];
+
     const topicImageMap = {
       'BBQ': 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=800&q=80',
-      'Soup Pot': 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=800&q=80',
-      'Neon Sign': 'https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=800&q=80',
-      'Ding Ding Tram': 'https://images.unsplash.com/photo-1518684079-3c830dcef090?auto=format&fit=crop&w=800&q=80',
-      'Bamboo Birdcage': 'https://images.unsplash.com/photo-1522926193341-e9ffd686c60f?auto=format&fit=crop&w=800&q=80',
-      'Morning Market': 'https://images.unsplash.com/photo-1533900298318-6b8da08a523e?auto=format&fit=crop&w=800&q=80',
-      'Seafood Glass Jars': 'https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&w=800&q=80',
-      'Cut Tulips': 'https://images.unsplash.com/photo-1520763185298-1b434c919102?auto=format&fit=crop&w=800&q=80',
-      'Star Ferry': 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=800&q=80',
-      'Tong Lau Balcony': 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80',
-      'Herbal Tea': 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=800&q=80',
-      'Clotheslines': 'https://images.unsplash.com/photo-1582735689369-4fe89db7114c?auto=format&fit=crop&w=800&q=80',
-      'Mahjong Tiles': 'https://images.unsplash.com/photo-1611095790444-1dfa35e37b52?auto=format&fit=crop&w=800&q=80',
-      'Steamer Stack': 'https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=800&q=80',
-      'Alleyway Stray Cat': 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=80',
+      'Grilled': 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=800&q=80',
+      'Dairy': 'https://images.unsplash.com/photo-1528750997573-59b89d56f4f7?auto=format&fit=crop&w=800&q=80',
+      'Yogurt': 'https://images.unsplash.com/photo-1571212515416-fef01fc43637?auto=format&fit=crop&w=800&q=80',
+      'Medicine': 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80',
+      'Pills': 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80',
+      'Sushi': 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=800&q=80',
+      'Restroom': 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=800&q=80',
+      'Toilet': 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=800&q=80',
+      'Bin': 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=800&q=80',
+      'Supplies': 'https://images.unsplash.com/photo-1583947215259-38e31be8751f?auto=format&fit=crop&w=800&q=80',
+      'Hot pot': 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=800&q=80',
+      'Spicy': 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=800&q=80',
+      'Drinks': 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=800&q=80',
+      'Reflection': 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=800&q=80',
       'default': 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80'
     };
+
+    let recordsData = [];
+    let currentFilter = 'all';
+    let isFlipped = false;
+    let activeRecord = null;
+    let lastJsonString = "";
 
     function getFallbackImage(title) {
       if (!title) return topicImageMap['default'];
@@ -282,12 +311,6 @@
       }
       return topicImageMap['default'];
     }
-
-    let recordsData = [];
-    let currentFilter = 'all';
-    let isFlipped = false;
-    let activeRecord = null;
-    let lastJsonString = "";
 
     async function fetchTextFileContent(fileUrl) {
       if (!fileUrl) return null;
@@ -305,27 +328,32 @@
     function normalizeRecord(item) {
       const fileUrl = item.file || item.image || '';
       const rawText = item.text_content || '';
+      const rawType = (item.type || 'image').toLowerCase();
+      const isSound = rawType === 'sound' || rawType === 'audio';
+      const isText = rawType === 'text';
+      const normalizedType = isSound ? 'sound' : isText ? 'text' : 'image';
+
       return {
         catalog_id: item.id || item.catalog_id || 'REC-000',
-        type: item.type || 'image',
+        type: normalizedType,
         title: item.title || 'Untitled Specimen',
-        date: item.date || '',
-        place: item.place || '',
-        recorder: item.recorder || '',
+        date: item.date || 'UNKNOWN',
+        place: item.place || 'Unspecified location',
+        recorder: item.recorder || 'Anonymous',
         file: fileUrl,
         image: fileUrl || getFallbackImage(item.title),
         text_content: rawText ? rawText.trimStart() : '',
         sound_preset: item.sound_preset || '',
-        not_captured: item.not_captured || 'Not specified',
+        not_captured: item.not_captured || 'No additional observational data logged.',
         certainty: item.certainty ?? 3
       };
     }
 
     async function fetchRecordsData(manual = false) {
-      try {
-        const syncIcon = document.getElementById('syncIcon');
-        if (syncIcon && manual) syncIcon.classList.add('animate-spin');
+      const syncIcon = document.getElementById('syncIcon');
+      if (syncIcon && manual) syncIcon.classList.add('animate-spin');
 
+      try {
         const cacheBuster = `?t=${Date.now()}`;
         const response = await fetch(`records.json${cacheBuster}`, {
           cache: 'no-store',
@@ -350,24 +378,21 @@
 
         const normalized = rawArray.map(normalizeRecord);
 
-        // Pre-fetch external text file contents for text-type records if defined
+        // Pre-fetch external text content if available
         for (let rec of normalized) {
           if (rec.type === 'text' && rec.file && rec.file.endsWith('.txt')) {
             const loadedText = await fetchTextFileContent(rec.file);
-            if (loadedText) {
-              rec.text_content = loadedText.trimStart();
-            }
+            if (loadedText) rec.text_content = loadedText.trimStart();
           }
         }
 
         recordsData = normalized;
       } catch (err) {
-        console.warn('Using embedded records dataset:', err);
-        if (!recordsData.length) {
-          recordsData = fallbackDataset.map(normalizeRecord);
+        if (recordsData.length === 0) {
+          console.warn('Fallback to default embedded records:', err);
+          recordsData = defaultEmbeddedData.map(normalizeRecord);
         }
       } finally {
-        const syncIcon = document.getElementById('syncIcon');
         if (syncIcon) {
           setTimeout(() => syncIcon.classList.remove('animate-spin'), 300);
         }
@@ -376,11 +401,6 @@
       updateStatsAndFilterButtons();
       renderGallery();
     }
-
-    const fallbackDataset = [
-      { id: "REC-001", title: "BBQ", type: "image", file: "media/image1.jpg", date: "2026-08-00", place: "BBQ site, Shek O", recorder: "Queenie", not_captured: "The smell of charcoal and sizzling fat", certainty: 4 },
-      { id: "REC-019", title: "Soup Story", type: "text", file: "media/description.txt", text_content: "My aunt's soup recipe passed down through generations in the quiet kitchen...", date: "2026-08-12", place: "my aunt's flat", recorder: "Queenie", not_captured: "her tone. I have written the words but not the way she said them.", certainty: 2 }
-    ];
 
     function updateStatsAndFilterButtons() {
       const total = recordsData.length;
@@ -424,7 +444,7 @@
         const isSound = rec.type === 'sound' || rec.type === 'audio';
 
         if (rec.type === 'image') {
-          typeIcon = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 002-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>`;
+          typeIcon = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>`;
         } else if (isSound) {
           typeIcon = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>`;
         } else {
@@ -437,17 +457,17 @@
         const cleanTextContent = rawTextContent.trimStart();
 
         return `
-          <div onclick="openModal('${rec.catalog_id}')" class="group bg-slate-900 border border-slate-800 hover:border-amber-500/50 rounded-2xl p-5 flex flex-col justify-between transition-all duration-300 cursor-pointer h-[440px] shadow-lg">
+          <div onclick="openModal('${rec.catalog_id}')" class="group bg-slate-900 border border-slate-800/80 hover:border-amber-500/50 rounded-2xl p-5 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 cursor-pointer h-[440px]">
             <div class="space-y-3">
               <div class="flex items-center justify-between">
-                <span class="text-[10px] font-mono uppercase tracking-wider px-2.5 py-0.5 rounded border bg-slate-800 text-amber-400 border-slate-700 flex items-center gap-1.5 font-bold">
+                <span class="text-[10px] font-mono uppercase tracking-wider px-2.5 py-0.5 rounded-md border bg-slate-800 text-amber-400 border-slate-700 flex items-center gap-1.5 font-bold">
                   ${typeIcon}
                   ${displayType}
                 </span>
                 <span class="text-xs font-mono text-slate-400">${rec.catalog_id}</span>
               </div>
 
-              <!-- Media / Text Preview Area (Front of card) -->
+              <!-- Media / Text Preview Container -->
               <div class="w-full h-40 bg-slate-950 rounded-xl overflow-hidden relative border border-slate-800 flex items-center justify-center">
                 ${rec.type === 'image' ? `
                   <img src="${rec.file}" 
@@ -458,14 +478,21 @@
                   <div class="w-full h-full p-3 flex flex-col items-center justify-between bg-slate-950 text-slate-300 relative">
                     <div class="w-full flex justify-between items-center text-[9px] font-mono text-amber-400">
                       <span>AUDIO RECORDING</span>
+                      <span class="text-slate-500 font-normal">REC SPECIMEN</span>
                     </div>
-                    <div class="w-full flex items-center justify-center my-auto">
-                      <svg class="w-10 h-10 text-amber-400 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
+                    <div class="w-full flex items-center justify-center my-auto gap-1">
+                      <span class="w-1 h-6 bg-amber-400/60 rounded-full animate-bounce" style="animation-delay:0.1s"></span>
+                      <span class="w-1 h-10 bg-amber-400 rounded-full animate-bounce" style="animation-delay:0.3s"></span>
+                      <span class="w-1 h-4 bg-amber-400/40 rounded-full animate-bounce" style="animation-delay:0.2s"></span>
+                      <span class="w-1 h-8 bg-amber-400/80 rounded-full animate-bounce" style="animation-delay:0.4s"></span>
+                      <span class="w-1 h-5 bg-amber-400/50 rounded-full animate-bounce" style="animation-delay:0.15s"></span>
                     </div>
                     <audio controls onclick="event.stopPropagation()" src="${rec.file}" class="w-full h-7 rounded"></audio>
                   </div>
                 ` : `
-                  <div class="w-full h-full p-3 bg-slate-950 text-slate-300 font-mono text-[11px] overflow-y-auto leading-relaxed whitespace-pre-wrap text-left">${cleanTextContent}</div>
+                  <div class="w-full h-full p-3 bg-slate-950 text-slate-300 font-mono text-[11px] overflow-y-auto leading-relaxed whitespace-pre-wrap text-left select-none">
+                    ${cleanTextContent}
+                  </div>
                 `}
               </div>
 
@@ -476,7 +503,7 @@
               </div>
             </div>
 
-            <div>
+            <div class="pt-2">
               <button onclick="event.stopPropagation(); openModal('${rec.catalog_id}')" class="w-full py-2 px-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl transition-all text-xs uppercase tracking-wider cursor-pointer">
                 Examine Label
               </button>
@@ -491,9 +518,9 @@
       ['All', 'Image', 'Sound', 'Text'].forEach(cat => {
         const btn = document.getElementById(`btnFilter${cat}`);
         if (cat.toLowerCase() === category) {
-          btn.className = 'px-2.5 py-1 rounded-md text-amber-400 bg-slate-800 transition-all';
+          btn.className = 'px-3 py-1 rounded-lg text-amber-400 bg-slate-800 transition-all font-semibold';
         } else {
-          btn.className = 'px-2.5 py-1 rounded-md text-slate-400 hover:text-slate-200 transition-all';
+          btn.className = 'px-3 py-1 rounded-lg text-slate-400 hover:text-slate-200 transition-all';
         }
       });
       renderGallery();
@@ -520,7 +547,9 @@
       document.getElementById('valDatePlace').textContent = `${activeRecord.date} — ${activeRecord.place}`;
       document.getElementById('valRecorder').textContent = activeRecord.recorder;
       document.getElementById('valNotCaptured').textContent = activeRecord.not_captured;
-      document.getElementById('valCertainty').textContent = `Certainty: ${activeRecord.certainty}/5`;
+      
+      const stars = '★'.repeat(activeRecord.certainty) + '☆'.repeat(Math.max(0, 5 - activeRecord.certainty));
+      document.getElementById('valCertainty').textContent = `Certainty: ${stars} (${activeRecord.certainty}/5)`;
 
       const mediaBox = document.getElementById('mediaBox');
       const fallbackUrl = getFallbackImage(activeRecord.title);
@@ -537,9 +566,13 @@
           <div class="w-full h-full p-4 flex flex-col items-center justify-between bg-slate-950 text-slate-300 border border-slate-800 rounded-xl relative overflow-hidden">
             <div class="w-full flex justify-between items-center font-mono text-[10px] text-amber-400 tracking-wider">
               <span>AUDIO ARCHIVE</span>
+              <span class="text-slate-500">FORMAT: MP3</span>
             </div>
-            <div class="my-auto">
-              <svg class="w-12 h-12 text-amber-400 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
+            <div class="my-auto flex items-center justify-center gap-1.5">
+              <span class="w-1.5 h-8 bg-amber-400 rounded-full animate-pulse"></span>
+              <span class="w-1.5 h-12 bg-amber-400 rounded-full animate-pulse" style="animation-delay:0.2s"></span>
+              <span class="w-1.5 h-6 bg-amber-400 rounded-full animate-pulse" style="animation-delay:0.4s"></span>
+              <span class="w-1.5 h-10 bg-amber-400 rounded-full animate-pulse" style="animation-delay:0.1s"></span>
             </div>
             <div class="w-full">
               <audio controls src="${activeRecord.file}" class="w-full h-9 rounded"></audio>
@@ -550,8 +583,9 @@
         const textDisplayContent = (activeRecord.text_content || activeRecord.not_captured || 'Loading text stream...').trimStart();
         mediaBox.innerHTML = `
           <div class="w-full h-full p-4 bg-slate-950 border border-slate-800 rounded-xl flex flex-col relative overflow-hidden font-mono text-xs text-slate-200">
-            <div class="text-[10px] text-amber-400 uppercase tracking-widest mb-2 font-bold">
-              Text Transcript:
+            <div class="text-[10px] text-amber-400 uppercase tracking-widest mb-2 font-bold flex justify-between items-center">
+              <span>Text Transcript:</span>
+              <span class="text-slate-500 text-[9px]">TXT SPECIMEN</span>
             </div>
             <div class="overflow-y-auto flex-1 pr-1 leading-relaxed whitespace-pre-wrap font-[Courier_New,Courier,monospace] text-left">
               ${textDisplayContent}
@@ -601,10 +635,17 @@
       }
     }
 
+    // Keyboard navigation (Esc to close modal)
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    // Auto-polling for real-time JSON sync every 3 seconds
     setInterval(() => {
       fetchRecordsData(false);
-    }, 2500);
+    }, 3000);
 
+    // Initial load on DOM ready
     document.addEventListener('DOMContentLoaded', () => {
       fetchRecordsData();
     });

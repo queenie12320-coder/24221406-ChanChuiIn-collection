@@ -58,8 +58,8 @@
     },
     {
       "id": "REC-006",
-      "title": "Buy medicine ",
-      "type": "I came here for medicine after my diarrheal response",
+      "title": "I came here for medicine after my diarrheal respons",
+      "type": "image",
       "file": "media/image3.jpg",
       "date": "2026-08-30",
       "place": "廣溢中西藥行有限公司 ",
@@ -157,13 +157,13 @@
     },
     {
       "id": "REC-015",
-      "title": "Reflection",
-      "type": "text",
-      "file": "media/reflection.txt",
+      "title": "Resting at home after the diarrheal response wore me out",
+      "type": "image",
+      "file": "media/image14.jpg",
       "date": "2026-08-12",
-      "place": "my aunt's flat",
+      "place": "At home ",
       "recorder": "Queenie",
-      "not_captured": "her tone. I have written the words but not the way she said them.",
+      "not_captured": "The photo shows my bed, but it can't show how tired and weak I felt lying here recovering.",
       "certainty": 2
     },
     {
@@ -191,7 +191,7 @@
     {
       "id": "REC-018",
       "title": "Supplies I needed during my diarrheal response",
-      "type": "sound",
+      "type": "iamge",
       "file": "media/image11.jpg",
       "date": "2026-08-12",
       "place": "At home ",
