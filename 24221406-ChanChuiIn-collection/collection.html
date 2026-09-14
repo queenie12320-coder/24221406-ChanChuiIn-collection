@@ -113,11 +113,12 @@
           20
         </div>
         <div>
-          <h1 class="text-lg font-bold text-slate-100 tracking-tight flex items-center gap-2">
+          <h1 class="text-lg font-bold text-slate-100 tracking-tight flex items-center gap-2 flex-wrap">
             ARCHIVAL REPOSITORY
+            <span class="text-amber-400 font-serif italic text-sm font-normal">"Loop of Pure Pleasure and Pain"</span>
             <span id="collectionTitle" class="text-xs px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 font-mono font-normal">ARTT3005</span>
           </h1>
-          <p id="statsSubtitle" class="text-xs text-slate-400">20 Total Specimens • 15 Images • 3 Audio • 2 Text</p>
+          <p id="statsSubtitle" class="text-xs text-slate-400">Loading catalog statistics...</p>
         </div>
       </div>
 
@@ -129,9 +130,9 @@
 
         <div class="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-medium">
           <button onclick="setCategoryFilter('all')" id="btnFilterAll" class="px-3 py-1 rounded-lg text-amber-400 bg-slate-800 transition-all">All (20)</button>
-          <button onclick="setCategoryFilter('image')" id="btnFilterImage" class="px-3 py-1 rounded-lg text-slate-400 hover:text-slate-200 transition-all">Image (15)</button>
-          <button onclick="setCategoryFilter('sound')" id="btnFilterSound" class="px-3 py-1 rounded-lg text-slate-400 hover:text-slate-200 transition-all">Sound (3)</button>
-          <button onclick="setCategoryFilter('text')" id="btnFilterText" class="px-3 py-1 rounded-lg text-slate-400 hover:text-slate-200 transition-all">Text (2)</button>
+          <button onclick="setCategoryFilter('image')" id="btnFilterImage" class="px-3 py-1 rounded-lg text-slate-400 hover:text-slate-200 transition-all">Image</button>
+          <button onclick="setCategoryFilter('sound')" id="btnFilterSound" class="px-3 py-1 rounded-lg text-slate-400 hover:text-slate-200 transition-all">Sound</button>
+          <button onclick="setCategoryFilter('text')" id="btnFilterText" class="px-3 py-1 rounded-lg text-slate-400 hover:text-slate-200 transition-all">Text</button>
         </div>
 
         <button onclick="fetchRecordsData(true)" title="Sync records dataset" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-mono transition-all active:scale-95 cursor-pointer">
@@ -254,24 +255,22 @@
   </div>
 
   <script>
-    // Embedded dataset with all 20 records (15 Images, 3 Sounds, 2 Text)
-    // REC-006, REC-015, REC-018 are explicitly set as "image" type
     const defaultEmbeddedData = [
       { id: "REC-001", title: "Table of grilled meat that triggered my diarrheal response", type: "image", file: "media/image.jpg", date: "2026-07-04", place: "Korean BBQ Restaurant", recorder: "Queenie", not_captured: "This photo shows the food, but you can't feel how greasy it tasted and the bad stomach cramps that came later.", certainty: 4 },
       { id: "REC-002", title: "Dairy drinks that triggered my diarrheal response", type: "image", file: "media/image1.jpg", date: "2026-09-12", place: "7-11 shop", recorder: "Queenie", not_captured: "The picture shows the fridge full of dairy, yet it misses the cold creamy taste and how sorry I felt after drinking.", certainty: 4 },
       { id: "REC-003", title: "Diarrhoea", type: "sound", file: "media/Pum.mp3", date: "2026-08-12", place: "Toilet in the shopping mall", recorder: "Queenie", not_captured: "odor of feces", certainty: 3 },
       { id: "REC-004", title: "Grilled skewers before my diarrheal response kicked in", type: "image", file: "media/image2.jpeg", date: "2026-08-12", place: "大尾督嘉年華燒烤 BBQ Party", recorder: "Queenie", not_captured: "You see the grilled food here, but not the oily flavour and my slowly aching stomach.", certainty: 3 },
-      { id: "REC-005", title: "Reflection", type: "text", file: "media/regret.txt", date: "2026-08-12", place: "my aunt's flat", recorder: "Queenie", not_captured: "her tone. I have written the words but not the way she said them.", certainty: 2 },
+      { id: "REC-005", title: "Post-experience reflection on repeated diarrheal", type: "text", file: "media/regret.txt", date: "2026-08-12", place: "my aunt's flat", recorder: "Queenie", not_captured: "her tone. I have written the words but not the way she said them.", certainty: 2 },
       { id: "REC-006", title: "Buy medicine", type: "image", file: "media/image3.jpg", date: "2026-08-30", place: "廣溢中西藥行有限公司", recorder: "Queenie", not_captured: "It's just a photo of the shop front. It cannot show my sharp stomach pain and how worried I was.", certainty: 4 },
       { id: "REC-007", title: "Sushi and receipt that led to my diarrheal response", type: "image", file: "media/image4.jpg", date: "2026-09-12", place: "Sushi Express", recorder: "Queenie", not_captured: "I captured the sushi and receipt, but the raw‑fish texture and painful gut trouble are totally lost.", certainty: 4 },
-      { id: "REC-008", title: "Stoma che", type: "sound", file: "media/Cartoon stomach growling sfx.mp3", date: "2026-08-12", place: "my aunt's flat", recorder: "Queenie", not_captured: "the smell, and how hot the room was", certainty: 3 },
-      { id: "REC-009", title: "Yogurt and milk I drank before my diarrheal response", type: "image", file: "media/image5.jpg", date: "2024-04-12", place: "At home", recorder: "Queenie", not_captured: "The image shows these dairy bottles, but you cannot taste their thick texture or feel my stomach reacting badly.", certainty: 3 },
-      { id: "REC-010", title: "Reflection", type: "text", file: "media/reflection.txt", date: "2026-08-12", place: "my aunt's flat", recorder: "Queenie", not_captured: "her tone. I have written the words but not the way she said them.", certainty: 2 },
+      { id: "REC-008", title: "Stomachache", type: "sound", file: "media/Cartoon stomach growling sfx.mp3", date: "2026-08-12", place: "my aunt's flat", recorder: "Queenie", not_captured: "the smell, and how hot the room was", certainty: 3 },
+      { id: "REC-009", title: "Yogurt and milk I drank before my diarrheal response", type: "image", file: "media/image5.jpg", date: "2026-04-12", place: "At home", recorder: "Queenie", not_captured: "The image shows these dairy bottles, but you cannot taste their thick texture or feel my stomach reacting badly.", certainty: 3 },
+      { id: "REC-010", title: "Real-time physical feeling during a diarrheal response", type: "text", file: "media/reflection.txt", date: "2026-08-12", place: "my aunt's flat", recorder: "Queenie", not_captured: "her tone. I have written the words but not the way she said them.", certainty: 2 },
       { id: "REC-011", title: "Store shelf-digestive pills for my diarrheal response", type: "image", file: "media/image6.jpg", date: "2026-09-02", place: "Convenience-store medicine shelf", recorder: "Queenie", not_captured: "The pill boxes are in view, but my ongoing stomach cramping and personal regret cannot be photographed.", certainty: 4 },
-      { id: "REC-012", title: "Restroom sign when my diarrheal response hit", type: "image", file: "media/image7.jpg", date: "2026-09-03", place: "Toilet in MTR station", recorder: "Queenie", not_captured: "This is only a restroom sign. It can'record how panicked I was and how badly I needed the toilet.", certainty: 4 },
+      { id: "REC-012", title: "Restroom sign when my diarrheal response hit", type: "image", file: "media/image7.jpg", date: "2026-09-03", place: "Toilet in MTR station", recorder: "Queenie", not_captured: "This is only a restroom sign. It can't record how panicked I was and how badly I needed the toilet.", certainty: 4 },
       { id: "REC-013", title: "Eating", type: "sound", file: "media/badger eating peanuts.mp3", date: "2026-08-12", place: "In the restaurant", recorder: "Queenie", not_captured: "the smell, and how hot the room was", certainty: 3 },
       { id: "REC-014", title: "Bin with used tissue after my diarrheal response", type: "image", file: "media/image8.jpeg", date: "2026-09-03", place: "Toilet in MTR station", recorder: "Queenie", not_captured: "The bin and tissue are visible, yet the bad odour and my physical tiredness cannot be caught in a photo.", certainty: 3 },
-      { id: "REC-015", title: "Reflection", type: "image", file: "media/image14.jpg", date: "2026-08-12", place: "my aunt's flat", recorder: "Queenie", not_captured: "her tone. I have written the words but not the way she said them.", certainty: 2 },
+      { id: "REC-015", title: "Reflection", type: "image", file: "media/image14.jpg", date: "2026-08-12", place: "my aunt's flat", recorder: "Queenie", not_captured: "The photograph shows the quiet room, but misses the anxious feeling and heavy atmosphere.", certainty: 2 },
       { id: "REC-016", title: "Medicine I took to ease my diarrheal response", type: "image", file: "media/image9.jpg", date: "2026-10-12", place: "At home", recorder: "Queenie", not_captured: "I photographed the medicine packaging, but the dull leftover ache inside my belly is missing from this record.", certainty: 4 },
       { id: "REC-017", title: "Toilet when my diarrheal response hit hard", type: "image", file: "media/image10.jpg", date: "2026-01-01", place: "Shopping mall", recorder: "Queenie", not_captured: "The photo only shows the toilet bowl. It can't capture how urgent I felt and the painful stomach cramps.", certainty: 4 },
       { id: "REC-018", title: "Supplies I needed during my diarrheal response", type: "image", file: "media/image11.jpg", date: "2026-08-12", place: "At home", recorder: "Queenie", not_captured: "You can see the roll of toilet paper here, but it doesn't show how often I had to reach for it.", certainty: 3 },
@@ -298,27 +297,31 @@
       'default': 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80'
     };
 
+    function getFallbackImage(title) {
+      if (!title) return topicImageMap['default'];
+      const titleLower = title.toLowerCase();
+      for (const [key, value] of Object.entries(topicImageMap)) {
+        if (key !== 'default' && titleLower.includes(key.toLowerCase())) {
+          return value;
+        }
+      }
+      return topicImageMap['default'];
+    }
+
     let recordsData = [];
     let currentFilter = 'all';
     let isFlipped = false;
     let activeRecord = null;
     let lastJsonString = "";
 
-    function getFallbackImage(title) {
-      if (!title) return topicImageMap['default'];
-      for (const [key, url] of Object.entries(topicImageMap)) {
-        if (title.toLowerCase().includes(key.toLowerCase())) return url;
-      }
-      return topicImageMap['default'];
-    }
-
     async function fetchTextFileContent(fileUrl) {
       if (!fileUrl) return null;
       try {
-        const res = await fetch(fileUrl);
-        if (!res.ok) throw new Error('Failed to fetch text file');
+        const urlWithCacheBuster = fileUrl + (fileUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
+        const res = await fetch(urlWithCacheBuster, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`Failed to fetch text file ${fileUrl}: ${res.status}`);
         const text = await res.text();
-        return text.trimStart();
+        return text;
       } catch (err) {
         console.warn('Could not load external text file:', fileUrl, err);
         return null;
@@ -326,25 +329,38 @@
     }
 
     function normalizeRecord(item) {
-      const fileUrl = item.file || item.image || '';
+      const fileUrl = (item.file || item.image || '').trim();
       const rawText = item.text_content || '';
-      const rawType = (item.type || 'image').toLowerCase();
-      const isSound = rawType === 'sound' || rawType === 'audio';
-      const isText = rawType === 'text';
-      const normalizedType = isSound ? 'sound' : isText ? 'text' : 'image';
+      const rawType = (item.type || '').toLowerCase().trim();
+
+      // Robust media type detection: check file extensions first as authoritative source
+      let normalizedType = 'image';
+      if (fileUrl.match(/\.(mp3|wav|ogg)$/i)) {
+        normalizedType = 'sound';
+      } else if (fileUrl.match(/\.txt$/i)) {
+        normalizedType = 'text';
+      } else if (fileUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+        normalizedType = 'image';
+      } else if (rawType === 'sound' || rawType === 'audio') {
+        normalizedType = 'sound';
+      } else if (rawType === 'text') {
+        normalizedType = 'text';
+      } else {
+        normalizedType = 'image';
+      }
 
       return {
         catalog_id: item.id || item.catalog_id || 'REC-000',
         type: normalizedType,
-        title: item.title || 'Untitled Specimen',
-        date: item.date || 'UNKNOWN',
-        place: item.place || 'Unspecified location',
-        recorder: item.recorder || 'Anonymous',
+        title: (item.title || 'Untitled Specimen').trim(),
+        date: (item.date || 'UNKNOWN').trim(),
+        place: (item.place || 'Unspecified location').trim(),
+        recorder: (item.recorder || 'Anonymous').trim(),
         file: fileUrl,
         image: fileUrl || getFallbackImage(item.title),
         text_content: rawText ? rawText.trimStart() : '',
         sound_preset: item.sound_preset || '',
-        not_captured: item.not_captured || 'No additional observational data logged.',
+        not_captured: (item.not_captured || 'No additional observational data logged.').trim(),
         certainty: item.certainty ?? 3
       };
     }
@@ -355,43 +371,62 @@
 
       try {
         const cacheBuster = `?t=${Date.now()}`;
-        const response = await fetch(`records.json${cacheBuster}`, {
-          cache: 'no-store',
-          headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
-        });
+        let rawArray = [];
 
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        
-        const rawText = await response.text();
-        if (rawText === lastJsonString && !manual) {
-          if (syncIcon && manual) syncIcon.classList.remove('animate-spin');
-          return;
-        }
-        
-        const data = JSON.parse(rawText);
-        lastJsonString = rawText;
+        try {
+          const response = await fetch(`records.json${cacheBuster}`, {
+            cache: 'no-store',
+            headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
+          });
 
-        const rawArray = Array.isArray(data) ? data : (data.records || []);
-        if (data.collection) {
-          document.getElementById('collectionTitle').textContent = data.collection;
+          if (response.ok) {
+            const rawText = await response.text();
+            lastJsonString = rawText;
+            const data = JSON.parse(rawText);
+            rawArray = Array.isArray(data) ? data : (data.records || []);
+            if (data.collection) {
+              document.getElementById('collectionTitle').textContent = data.collection;
+            }
+          } else {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+        } catch (jsonErr) {
+          console.warn('Could not load records.json, using embedded default list:', jsonErr);
+          rawArray = defaultEmbeddedData;
         }
 
         const normalized = rawArray.map(normalizeRecord);
 
-        // Pre-fetch external text content if available
+        // Always re-fetch external .txt files (media/regret.txt and media/reflection.txt) to override text content
         for (let rec of normalized) {
-          if (rec.type === 'text' && rec.file && rec.file.endsWith('.txt')) {
+          if (rec.type === 'text' && rec.file) {
             const loadedText = await fetchTextFileContent(rec.file);
-            if (loadedText) rec.text_content = loadedText.trimStart();
+            if (loadedText !== null && loadedText !== undefined) {
+              rec.text_content = loadedText;
+            }
           }
         }
 
         recordsData = normalized;
-      } catch (err) {
-        if (recordsData.length === 0) {
-          console.warn('Fallback to default embedded records:', err);
-          recordsData = defaultEmbeddedData.map(normalizeRecord);
+
+        // If modal is open, refresh active text record dynamically
+        if (activeRecord && activeRecord.type === 'text') {
+          const updatedActive = recordsData.find(r => r.catalog_id === activeRecord.catalog_id);
+          if (updatedActive) {
+            activeRecord = updatedActive;
+            const mediaBox = document.getElementById('mediaBox');
+            if (mediaBox && !document.getElementById('modalOverlay').classList.contains('hidden')) {
+              const textDisplayContent = (activeRecord.text_content || activeRecord.not_captured || '').trimStart();
+              const transcriptElement = mediaBox.querySelector('.whitespace-pre-wrap');
+              if (transcriptElement) {
+                transcriptElement.textContent = textDisplayContent;
+              }
+            }
+          }
         }
+
+      } catch (err) {
+        console.error('Error in fetchRecordsData:', err);
       } finally {
         if (syncIcon) {
           setTimeout(() => syncIcon.classList.remove('animate-spin'), 300);
