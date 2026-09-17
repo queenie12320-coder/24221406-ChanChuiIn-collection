@@ -1,0 +1,1642 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hot Pot Pixel Steam & Media Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fff7ed',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                            900: '#7c2d12',
+                        },
+                        dark: {
+                            900: '#0c0a09',
+                            800: '#1c1917',
+                            700: '#292524',
+                            600: '#44403c',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- JSZip for Batch Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <!-- FileSaver JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0c0a09;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #292524;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #44403c;
+        }
+        canvas {
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            touch-action: none;
+        }
+    </style>
+</head>
+<body class="bg-dark-900 text-stone-100 min-h-screen flex flex-col antialiased selection:bg-brand-600 selection:text-white">
+
+    <header class="border-b border-dark-700 bg-dark-800/90 backdrop-blur sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+            <!-- Brand Logo -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-700 via-brand-600 to-amber-500 flex items-center justify-center shadow-lg shadow-brand-600/20">
+                    <i data-lucide="flame" class="w-6 h-6 text-white animate-pulse"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight tracking-tight text-white flex items-center gap-2">
+                        Hot Pot Steam & Pixel Studio
+                        <span class="text-[10px] bg-brand-600/20 text-brand-500 font-semibold px-2 py-0.5 rounded-full border border-brand-500/30">Interactive</span>
+                    </h1>
+                    <p class="text-xs text-stone-400">Atmospheric Fog Filter & Top-Down Grid Sorting</p>
+                </div>
+            </div>
+
+            <!-- Global Action Bar -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <button id="btnRefillSoup" class="text-xs sm:text-sm bg-amber-600/90 hover:bg-amber-500 text-white px-3 py-2 rounded-xl flex items-center gap-2 transition font-medium border border-amber-500/30 shadow-md shadow-amber-600/20">
+                    <i data-lucide="utensils" class="w-4 h-4 text-amber-100"></i>
+                    <span>Refill Ingredients</span>
+                </button>
+
+                <button id="btnInstantDissolve" class="text-xs sm:text-sm bg-rose-600/90 hover:bg-rose-500 text-white px-3 py-2 rounded-xl flex items-center gap-2 transition font-medium border border-rose-500/30 shadow-md shadow-rose-600/20" title="Instantly fill fog grid">
+                    <i data-lucide="sparkles" class="w-4 h-4 text-rose-100 animate-spin"></i>
+                    <span>Instant Fog Grid</span>
+                </button>
+
+                <button id="btnLoadDefaultHotpot" class="text-xs sm:text-sm bg-dark-700 hover:bg-dark-600 text-stone-200 px-3 py-2 rounded-xl flex items-center gap-2 transition font-medium border border-dark-600" title="Load Double-Flavour Hot Pot Image">
+                    <i data-lucide="soup" class="w-4 h-4 text-brand-500"></i>
+                    <span class="hidden sm:inline">Load Preset</span>
+                </button>
+
+                <button id="btnToggleZones" class="text-xs sm:text-sm bg-dark-700 hover:bg-dark-600 text-stone-200 px-3 py-2 rounded-xl flex items-center gap-2 transition font-medium border border-dark-600">
+                    <i data-lucide="scan" class="w-4 h-4 text-emerald-400"></i>
+                    <span id="zoneToggleText" class="hidden sm:inline">Hide Zone Overlays</span>
+                </button>
+
+                <button id="btnRecordVideo" class="text-xs sm:text-sm bg-rose-600 hover:bg-rose-500 text-white px-3.5 py-2 rounded-xl flex items-center gap-2 transition font-medium shadow-md shadow-rose-600/20">
+                    <i data-lucide="video" class="w-4 h-4"></i>
+                    <span id="recordBtnText">Record Interaction</span>
+                </button>
+
+                <button id="btnExportImage" class="text-xs sm:text-sm bg-brand-600 hover:bg-brand-500 text-white px-4 py-2 rounded-xl flex items-center gap-2 transition font-medium shadow-md shadow-brand-600/30">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    <span>Export Image</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col lg:flex-row gap-6">
+
+        <!-- Left Column: Interactive Canvas Viewport & Zone Mapping -->
+        <div class="flex-1 flex flex-col gap-4">
+            
+            <!-- Canvas Display Box -->
+            <div class="relative bg-dark-800 rounded-2xl border border-dark-700/80 p-2 overflow-hidden shadow-2xl group flex items-center justify-center min-h-[420px] sm:min-h-[520px]">
+                
+                <!-- Main Canvas -->
+                <canvas id="studioCanvas" class="max-w-full max-h-[72vh] rounded-xl object-contain cursor-crosshair shadow-lg"></canvas>
+
+                <!-- On-Canvas Guidance Badge -->
+                <div class="absolute top-4 left-4 pointer-events-none flex flex-col gap-1.5 z-10">
+                    <div class="bg-dark-900/80 backdrop-blur border border-dark-700 text-xs px-3 py-1.5 rounded-lg flex items-center gap-2 text-stone-300 shadow-lg">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+                        <span>Stir soup to sort pixels into a top-left grid with an <strong class="text-amber-400">atmospheric fog color filter</strong>!</span>
+                    </div>
+                </div>
+
+                <!-- Full Dissolution Banner Overlay -->
+                <div id="fullDissolutionBanner" class="absolute top-16 left-1/2 -translate-x-1/2 z-20 bg-dark-900/95 border border-amber-500/60 text-amber-200 px-5 py-2.5 rounded-2xl shadow-2xl backdrop-blur-md flex items-center gap-3 transition-all duration-300 opacity-0 pointer-events-none">
+                    <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                        <i data-lucide="sparkles" class="w-5 h-5 animate-spin"></i>
+                    </div>
+                    <div>
+                        <div class="font-bold text-xs text-amber-300">Fog Grid Full Reached (100%)</div>
+                        <div class="text-[11px] text-stone-300">Grid fully filled with fogged pixels! Click <strong class="text-amber-400 font-semibold cursor-pointer underline" onclick="$('btnRefillSoup').click()">Refill Ingredients</strong> to restore pot.</div>
+                    </div>
+                </div>
+
+                <!-- Live Color Sample HUD -->
+                <div id="sampleHud" class="absolute bottom-4 left-4 z-10 bg-dark-900/90 backdrop-blur border border-dark-700/90 rounded-xl p-2.5 flex items-center gap-3 text-xs shadow-xl hidden">
+                    <div id="sampleColorSwatch" class="w-7 h-7 rounded-lg border border-white/20 shadow-inner"></div>
+                    <div>
+                        <div class="text-[10px] text-stone-400 font-medium uppercase tracking-wider">Sampled Hot Pot RGB</div>
+                        <div id="sampleRgbText" class="font-mono text-stone-200 font-semibold">rgb(255, 255, 255)</div>
+                    </div>
+                </div>
+
+                <!-- Dropzone Drag Overlay -->
+                <div id="dropzone" class="absolute inset-0 bg-dark-900/90 backdrop-blur-sm border-2 border-dashed border-brand-500/80 rounded-xl flex flex-col items-center justify-center gap-3 p-6 transition-all duration-200 opacity-0 pointer-events-none z-30">
+                    <div class="w-16 h-16 rounded-2xl bg-brand-600/20 text-brand-500 flex items-center justify-center">
+                        <i data-lucide="upload-cloud" class="w-8 h-8"></i>
+                    </div>
+                    <div class="text-center">
+                        <h3 class="text-base font-semibold text-stone-200">Drop Image or Video Here</h3>
+                        <p class="text-xs text-stone-400 mt-1">Supports JPG, PNG, WebP, SVG, and MP4 files</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Toolbar below Canvas -->
+            <div class="flex flex-wrap items-center justify-between gap-3 bg-dark-800/60 p-3 rounded-xl border border-dark-700/80 text-xs text-stone-300">
+                <div class="flex items-center gap-3">
+                    <button id="btnImportLocal" class="bg-dark-700 hover:bg-dark-600 text-stone-200 px-3 py-1.5 rounded-lg border border-dark-600 transition flex items-center gap-1.5 font-medium">
+                        <i data-lucide="upload" class="w-3.5 h-3.5 text-brand-500"></i> Import Local Asset
+                    </button>
+                    <input type="file" id="fileInput" accept="image/*,video/mp4,video/webm" class="hidden">
+
+                    <button id="btnImportUrl" class="bg-dark-700 hover:bg-dark-600 text-stone-200 px-3 py-1.5 rounded-lg border border-dark-600 transition flex items-center gap-1.5 font-medium">
+                        <i data-lucide="link" class="w-3.5 h-3.5 text-indigo-400"></i> From Image URL
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-4 text-stone-400">
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                        <span>Hot Pot Sampling Zone (Drag ⊕ handle)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Draggable Zone Mapping Panel -->
+            <div class="bg-dark-800 rounded-2xl border border-dark-700/80 p-5 space-y-4">
+                <div class="flex items-center justify-between border-b border-dark-700 pb-3">
+                    <h3 class="font-semibold text-stone-100 text-sm flex items-center gap-2">
+                        <i data-lucide="target" class="w-4 h-4 text-emerald-400"></i> Hot Pot Zone Mapping
+                    </h3>
+                </div>
+
+                <div class="text-xs text-stone-400 space-y-1">
+                    <p>💡 <strong class="text-stone-200">Interactive Canvas Dragging:</strong> Click & drag the <strong class="text-rose-400">⊕ Soup handle</strong> directly on the canvas to reposition the hot pot.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                    <div class="space-y-3 md:col-span-2">
+                        <span class="text-xs font-semibold text-emerald-400 block border-b border-dark-700/60 pb-1.5">Soup Surface Sampling Ellipse</span>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-stone-300">Soup Center X</span>
+                                    <span id="valSoupX" class="text-emerald-400 font-mono">50%</span>
+                                </div>
+                                <input type="range" id="paramSoupX" min="10" max="90" step="1" value="50" class="w-full accent-emerald-500">
+                            </div>
+
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-stone-300">Soup Center Y</span>
+                                    <span id="valSoupY" class="text-emerald-400 font-mono">58%</span>
+                                </div>
+                                <input type="range" id="paramSoupY" min="30" max="90" step="1" value="58" class="w-full accent-emerald-500">
+                            </div>
+
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-stone-300">Soup Width</span>
+                                    <span id="valSoupRx" class="text-emerald-400 font-mono">35%</span>
+                                </div>
+                                <input type="range" id="paramSoupRx" min="10" max="50" step="1" value="35" class="w-full accent-emerald-500">
+                            </div>
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-stone-300">Soup Height</span>
+                                    <span id="valSoupRy" class="text-emerald-400 font-mono">20%</span>
+                                </div>
+                                <input type="range" id="paramSoupRy" min="5" max="40" step="1" value="20" class="w-full accent-emerald-500">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Column: Controls, Parameters & Export Panel -->
+        <div class="w-full lg:w-96 flex flex-col gap-5">
+            
+            <!-- Panel 0: Media Transform & Geometry -->
+            <div class="bg-dark-800 rounded-2xl border border-dark-700/80 p-5 space-y-4">
+                <div class="flex items-center justify-between border-b border-dark-700 pb-3">
+                    <h3 class="font-semibold text-stone-100 text-sm flex items-center gap-2">
+                        <i data-lucide="rotate-cw" class="w-4 h-4 text-sky-400"></i> Image Transform & Rotation
+                    </h3>
+                    <button id="btnResetTransform" class="text-[11px] text-stone-400 hover:text-stone-200 transition">Reset Transform</button>
+                </div>
+
+                <!-- Image Zoom / Scale Slider -->
+                <div class="space-y-1">
+                    <div class="flex justify-between text-xs">
+                        <span class="text-stone-300">Image Size / Scale</span>
+                        <span id="valImageScale" class="text-sky-400 font-mono">100%</span>
+                    </div>
+                    <input type="range" id="paramImageScale" min="0.3" max="2.5" step="0.05" value="1.0" class="w-full accent-sky-500">
+                </div>
+
+                <!-- Image Rotation Slider -->
+                <div class="space-y-1">
+                    <div class="flex justify-between text-xs">
+                        <span class="text-stone-300">Rotation Angle</span>
+                        <span id="valImageRotation" class="text-sky-400 font-mono">0°</span>
+                    </div>
+                    <input type="range" id="paramImageRotation" min="0" max="360" step="1" value="0" class="w-full accent-sky-500">
+                </div>
+
+                <!-- Quick Rotation Action Buttons -->
+                <div class="grid grid-cols-3 gap-2 pt-1">
+                    <button id="btnRotateCcw" class="bg-dark-700 hover:bg-dark-600 text-stone-300 text-xs py-1.5 px-2 rounded-lg font-medium border border-dark-600 transition flex items-center justify-center gap-1">
+                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> -90°
+                    </button>
+                    <button id="btnRotateCw" class="bg-dark-700 hover:bg-dark-600 text-stone-300 text-xs py-1.5 px-2 rounded-lg font-medium border border-dark-600 transition flex items-center justify-center gap-1">
+                        <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i> +90°
+                    </button>
+                    <button id="btnFlipHoriz" class="bg-dark-700 hover:bg-dark-600 text-stone-300 text-xs py-1.5 px-2 rounded-lg font-medium border border-dark-600 transition flex items-center justify-center gap-1">
+                        <i data-lucide="flip-horizontal" class="w-3.5 h-3.5"></i> 180°
+                    </button>
+                </div>
+            </div>
+
+            <!-- Live Steam Zone Coverage Gauge & Status Panel -->
+            <div id="coverageHud" class="bg-dark-800 rounded-2xl border border-dark-700/80 p-5 space-y-3 shadow-xl transition-all">
+                <div class="flex items-center justify-between font-semibold text-stone-100 text-xs pb-2 border-b border-dark-700">
+                    <span class="flex items-center gap-2">
+                        <span id="coverageIndicatorDot" class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+                        <i data-lucide="activity" class="w-4 h-4 text-indigo-400"></i> Fog Grid Status
+                    </span>
+                    <span id="coverageText" class="font-mono text-indigo-400 font-bold shrink-0">0.0% / 100.0%</span>
+                </div>
+                <div class="w-full bg-dark-700 h-2 rounded-full overflow-hidden border border-dark-600 relative">
+                    <div id="coverageBar" class="bg-indigo-500 h-full transition-all duration-150" style="width: 0%"></div>
+                    <div class="absolute top-0 bottom-0 left-[100%] w-0.5 bg-rose-500 shadow-sm" title="Critical Grid Full Threshold"></div>
+                </div>
+
+                <!-- Fog Density / Intensity -->
+                <div class="space-y-1 pt-1">
+                    <div class="flex justify-between text-xs">
+                        <span class="text-stone-300">Atmospheric Fog Opacity</span>
+                        <span id="valFogOpacity" class="text-amber-400 font-mono">45%</span>
+                    </div>
+                    <input type="range" id="paramFogOpacity" min="10" max="90" step="5" value="45" class="w-full accent-amber-500">
+                </div>
+
+                <!-- Ingredient Dissolution Gauge -->
+                <div class="flex items-center justify-between font-semibold text-stone-200 text-[11px] pt-1">
+                    <span class="flex items-center gap-1.5 text-amber-400">
+                        <i data-lucide="flame" class="w-3.5 h-3.5 text-amber-400"></i>
+                        Hot Pot Pixel Disintegration
+                    </span>
+                    <span id="dissolutionText" class="font-mono text-amber-400 font-bold shrink-0">0.0%</span>
+                </div>
+                <div class="w-full bg-dark-700 h-1.5 rounded-full overflow-hidden border border-dark-600">
+                    <div id="dissolutionBar" class="bg-gradient-to-r from-amber-500 to-rose-500 h-full transition-all duration-150" style="width: 0%"></div>
+                </div>
+
+                <!-- Live Stir Energy Gauge -->
+                <div class="flex items-center justify-between font-semibold text-stone-200 text-[11px] pt-1">
+                    <span class="flex items-center gap-1.5 text-brand-500">
+                        <i data-lucide="zap" class="w-3 h-3 text-brand-500 animate-bounce"></i>
+                        Hot Pot Stir Energy
+                    </span>
+                    <span id="stirEnergyText" class="font-mono text-brand-400 font-bold shrink-0">0.0%</span>
+                </div>
+                <div class="w-full bg-dark-700 h-1.5 rounded-full overflow-hidden border border-dark-600">
+                    <div id="stirEnergyBar" class="bg-gradient-to-r from-amber-500 to-brand-500 h-full transition-all duration-75" style="width: 0%"></div>
+                </div>
+
+                <div class="text-[11px] font-medium text-stone-400 flex items-center justify-between pt-1 border-t border-dark-700/60">
+                    <span>Target: <strong class="text-amber-400">Top-Left Fog Grid</strong></span>
+                    <span id="coverageStateLabel" class="text-emerald-400 font-semibold">Active</span>
+                </div>
+            </div>
+
+            <!-- Broth & Heat Intensity Panel -->
+            <div class="bg-dark-800 rounded-2xl border border-dark-700/80 p-5 space-y-4">
+                <div class="flex items-center justify-between border-b border-dark-700 pb-3">
+                    <h3 class="font-semibold text-stone-100 text-sm flex items-center gap-2">
+                        <i data-lucide="sparkles" class="w-4 h-4 text-amber-400"></i> Broth & Heat Intensity
+                    </h3>
+                    <button id="btnResetBroth" class="text-[11px] text-stone-400 hover:text-stone-200 transition">Reset Broth</button>
+                </div>
+
+                <!-- Broth Temperature Slider -->
+                <div class="space-y-1">
+                    <div class="flex justify-between text-xs">
+                        <span class="text-stone-300">Broth Boil Intensity</span>
+                        <span id="valBrothTemp" class="text-amber-400 font-mono">100°C</span>
+                    </div>
+                    <input type="range" id="paramBrothTemp" min="60" max="120" step="1" value="100" class="w-full accent-amber-500">
+                </div>
+
+                <!-- Spice Oil Density -->
+                <div class="space-y-1">
+                    <div class="flex justify-between text-xs">
+                        <span class="text-stone-300">Spice Oil Concentration</span>
+                        <span id="valOilDensity" class="text-amber-400 font-mono">50%</span>
+                    </div>
+                    <input type="range" id="paramOilDensity" min="0" max="100" step="5" value="50" class="w-full accent-amber-500">
+                </div>
+            </div>
+
+            <!-- Panel 1: Steam & Fragment Parameters -->
+            <div class="bg-dark-800 rounded-2xl border border-dark-700/80 p-5 space-y-4">
+                <div class="flex items-center justify-between border-b border-dark-700 pb-3">
+                    <h3 class="font-semibold text-stone-100 text-sm flex items-center gap-2">
+                        <i data-lucide="sliders" class="w-4 h-4 text-brand-500"></i> Steam & Grid Parameters
+                    </h3>
+                    <button id="btnResetParams" class="text-[11px] text-stone-400 hover:text-stone-200 transition">Reset Defaults</button>
+                </div>
+
+                <!-- Fragment Generation Rate Slider -->
+                <div class="space-y-1">
+                    <div class="flex justify-between text-xs">
+                        <span class="text-stone-300 font-medium">Generated Fragment Rate</span>
+                        <span id="valFragmentRate" class="text-brand-500 font-mono font-bold">20 / step</span>
+                    </div>
+                    <input type="range" id="paramFragmentRate" min="2" max="80" step="1" value="20" class="w-full accent-brand-500">
+                    <p class="text-[10px] text-stone-400">Controls total RGB fragments emitted per step.</p>
+                </div>
+
+                <!-- Auto-Stream Generation Toggle & Clear Button -->
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                    <button id="btnToggleAutoEmit" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs py-2 px-3 rounded-xl font-medium transition flex items-center justify-center gap-1.5 shadow-md shadow-indigo-600/20">
+                        <i data-lucide="play" class="w-3.5 h-3.5"></i>
+                        <span id="autoEmitBtnText">Auto-Emit Grid</span>
+                    </button>
+                    <button id="btnClearFragments" class="bg-dark-700 hover:bg-dark-600 text-stone-200 text-xs py-2 px-3 rounded-xl font-medium border border-dark-600 transition flex items-center justify-center gap-1.5">
+                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 text-amber-400"></i> Clear Grid
+                    </button>
+                </div>
+
+                <!-- Particle Spawn Mode -->
+                <div class="space-y-1.5">
+                    <label class="text-xs font-medium text-stone-300 block">Fragment Particle Style</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button data-mode="pixel" class="mode-btn active bg-brand-600 text-white text-xs py-1.5 px-3 rounded-lg font-medium transition">Pixel Blocks</button>
+                        <button data-mode="steam" class="mode-btn bg-dark-700 hover:bg-dark-600 text-stone-300 text-xs py-1.5 px-3 rounded-lg font-medium transition">Realistic Steam</button>
+                    </div>
+                </div>
+
+                <!-- Particle Size -->
+                <div class="space-y-1">
+                    <div class="flex justify-between text-xs">
+                        <span class="text-stone-300">Pixel Fragment Size</span>
+                        <span id="valParticleSize" class="text-brand-500 font-mono">8 px</span>
+                    </div>
+                    <input type="range" id="paramParticleSize" min="2" max="24" step="1" value="8" class="w-full accent-brand-500">
+                </div>
+            </div>
+
+            <!-- Panel 3: Batch Export & Actions -->
+            <div class="bg-dark-800 rounded-2xl border border-dark-700/80 p-5 space-y-4">
+                <div class="flex items-center justify-between border-b border-dark-700 pb-3">
+                    <h3 class="font-semibold text-stone-100 text-sm flex items-center gap-2">
+                        <i data-lucide="archive" class="w-4 h-4 text-brand-500"></i> Studio Export Tools
+                    </h3>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <button id="btnQuickSnapshot" class="bg-dark-700 hover:bg-dark-600 text-stone-200 text-xs py-2 rounded-xl border border-dark-600 font-medium transition flex items-center justify-center gap-1.5">
+                        <i data-lucide="camera" class="w-3.5 h-3.5 text-amber-400"></i> Snapshot Frame
+                    </button>
+                    <button id="btnBatchZipExport" class="bg-dark-700 hover:bg-dark-600 text-stone-200 text-xs py-2 rounded-xl border border-dark-600 font-medium transition flex items-center justify-center gap-1.5">
+                        <i data-lucide="file-archive" class="w-3.5 h-3.5 text-indigo-400"></i> Export ZIP Package
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- URL IMPORT MODAL -->
+    <div id="urlModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-dark-800 border border-dark-700 rounded-2xl max-w-md w-full flex flex-col overflow-hidden shadow-2xl">
+            <div class="p-4 border-b border-dark-700 flex items-center justify-between">
+                <h3 class="font-semibold text-stone-100 text-sm">Import Media from URL</h3>
+                <button class="btnCloseModal text-stone-400 hover:text-white p-1 rounded-lg">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="p-5 space-y-3 text-xs text-stone-300">
+                <label class="block font-medium text-stone-200">Image or Video URL</label>
+                <input type="url" id="mediaUrlInput" placeholder="https://images.unsplash.com/photo-..." class="w-full bg-dark-900 px-3 py-2 rounded-xl border border-dark-700 text-stone-200 focus:outline-none focus:border-brand-500">
+                <p class="text-[11px] text-stone-500">Ensure the remote image server permits CORS cross-origin requests.</p>
+            </div>
+
+            <div class="p-4 border-t border-dark-700 bg-dark-800/80 flex items-center justify-end gap-2">
+                <button class="btnCloseModal text-xs bg-dark-700 hover:bg-dark-600 text-stone-300 px-4 py-2 rounded-xl">Cancel</button>
+                <button id="btnConfirmUrlImport" class="text-xs bg-brand-600 hover:bg-brand-500 text-white font-medium px-4 py-2 rounded-xl transition">Fetch & Load</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <script>
+        const state = {
+            image: null,
+            video: null,
+            showZones: true,
+            mode: 'pixel', // 'pixel' or 'steam'
+            autoEmit: false,
+            coverage: 0.0,
+            dissolution: 0.0,
+            hasTriggeredFullDissolution: false,
+            stirEnergy: 0.0,
+            ripples: [],
+            params: {
+                fragmentRate: 20,
+                particleSize: 8,
+                fogOpacity: 0.45,
+                soupX: 0.50,
+                soupY: 0.58,
+                soupRx: 0.35,
+                soupRy: 0.20,
+                imageScale: 1.0,
+                imageRotation: 0,
+                imageOffsetX: 0,
+                imageOffsetY: 0,
+                brothTemp: 100,
+                oilDensity: 50
+            },
+            particles: [],
+            gridCount: 0,
+            dragState: {
+                active: false,
+                target: null
+            },
+            mouse: {
+                x: 0,
+                y: 0,
+                prevX: 0,
+                prevY: 0,
+                speed: 0,
+                isDown: false,
+                insideSoup: false,
+                currentRgb: [255, 255, 255]
+            },
+            recording: false,
+            mediaRecorder: null,
+            recordedChunks: [],
+            canvas: null,
+            ctx: null,
+            offscreenCanvas: null,
+            offscreenCtx: null,
+            soupErosionCanvas: null,
+            soupErosionCtx: null,
+            animationFrameId: null
+        };
+
+        const $ = (id) => document.getElementById(id);
+
+        function showToast(message, type = 'info') {
+            const container = $('toastContainer');
+            const toast = document.createElement('div');
+            
+            const bgColors = {
+                info: 'bg-dark-800 border-brand-500 text-stone-100',
+                success: 'bg-dark-800 border-emerald-500 text-emerald-300',
+                error: 'bg-dark-800 border-rose-500 text-rose-300',
+                warning: 'bg-dark-800 border-amber-500 text-amber-300'
+            };
+
+            const icons = {
+                info: 'info',
+                success: 'check-circle-2',
+                error: 'alert-triangle',
+                warning: 'alert-circle'
+            };
+
+            toast.className = `pointer-events-auto border-l-4 p-3.5 rounded-xl shadow-2xl text-xs font-medium flex items-center gap-2.5 transition-all duration-300 transform translate-y-2 opacity-0 ${bgColors[type] || bgColors.info}`;
+            toast.innerHTML = `<i data-lucide="${icons[type]}" class="w-4 h-4 shrink-0"></i><span>${message}</span>`;
+            
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            });
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        function generateDefaultHotPot() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024;
+            canvas.height = 768;
+            const ctx = canvas.getContext('2d');
+
+            const bgGrad = ctx.createRadialGradient(512, 384, 100, 512, 384, 600);
+            bgGrad.addColorStop(0, '#26201e');
+            bgGrad.addColorStop(1, '#0f0d0c');
+            ctx.fillStyle = bgGrad;
+            ctx.fillRect(0, 0, 1024, 768);
+
+            ctx.fillStyle = '#44403c';
+            ctx.beginPath();
+            ctx.arc(220, 250, 60, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(800, 250, 65, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#d1b894';
+            ctx.beginPath();
+            ctx.ellipse(200, 620, 110, 80, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#fae4b2';
+            ctx.beginPath();
+            ctx.ellipse(200, 615, 95, 65, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#991b1b';
+            ctx.beginPath();
+            ctx.roundRect(800, 520, 180, 120, 16);
+            ctx.fill();
+
+            const potCenterX = 512;
+            const potCenterY = 445;
+            const rx = 360;
+            const ry = 180;
+
+            ctx.fillStyle = '#1c1917';
+            ctx.shadowColor = '#000';
+            ctx.shadowBlur = 30;
+            ctx.beginPath();
+            ctx.ellipse(potCenterX, potCenterY, rx + 25, ry + 25, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            ctx.strokeStyle = '#44403c';
+            ctx.lineWidth = 12;
+            ctx.stroke();
+
+            ctx.fillStyle = '#120f0e';
+            ctx.beginPath();
+            ctx.ellipse(potCenterX, potCenterY, rx, ry, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.ellipse(potCenterX, potCenterY, rx - 5, ry - 5, 0, 0, Math.PI * 2);
+            ctx.clip();
+
+            const redGrad = ctx.createRadialGradient(potCenterX - 150, potCenterY, 30, potCenterX - 150, potCenterY, 250);
+            redGrad.addColorStop(0, '#ff3300');
+            redGrad.addColorStop(0.5, '#dc2626');
+            redGrad.addColorStop(1, '#7f1d1d');
+            ctx.fillStyle = redGrad;
+            ctx.fillRect(0, 0, potCenterX, 768);
+
+            const goldGrad = ctx.createRadialGradient(potCenterX + 150, potCenterY, 30, potCenterX + 150, potCenterY, 250);
+            goldGrad.addColorStop(0, '#fef08a');
+            goldGrad.addColorStop(0.4, '#f59e0b');
+            goldGrad.addColorStop(1, '#b45309');
+            ctx.fillStyle = goldGrad;
+            ctx.fillRect(potCenterX, 0, 1024, 768);
+
+            const oilCount = Math.round(45 * (state.params.oilDensity / 50));
+            for (let i = 0; i < oilCount; i++) {
+                const bx = potCenterX - 30 - Math.random() * 280;
+                const by = potCenterY - 120 + Math.random() * 240;
+                ctx.fillStyle = Math.random() > 0.4 ? '#ef4444' : '#b91c1c';
+                ctx.beginPath();
+                ctx.arc(bx, by, 3 + Math.random() * 12, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            for (let i = 0; i < 35; i++) {
+                const gx = potCenterX + 30 + Math.random() * 280;
+                const gy = potCenterY - 120 + Math.random() * 240;
+                ctx.fillStyle = Math.random() > 0.5 ? '#15803d' : '#fde047';
+                ctx.beginPath();
+                ctx.arc(gx, gy, 4 + Math.random() * 10, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            ctx.strokeStyle = '#a8a29e';
+            ctx.lineWidth = 10;
+            ctx.beginPath();
+            ctx.moveTo(potCenterX, potCenterY - ry + 5);
+            ctx.bezierCurveTo(potCenterX - 60, potCenterY - 50, potCenterX + 60, potCenterY + 50, potCenterX, potCenterY + ry - 5);
+            ctx.stroke();
+
+            ctx.restore();
+
+            const img = new Image();
+            img.onload = () => {
+                state.image = img;
+                state.video = null;
+                setupCanvasDimensions();
+                showToast('Loaded Double-Flavour Hot Pot base asset', 'success');
+            };
+            img.src = canvas.toDataURL('image/png');
+        }
+
+        function drawTransformedMedia(targetCtx, w, h) {
+            const media = state.image || state.video;
+            if (!media) return;
+
+            const origW = state.image ? state.image.width : state.video.videoWidth;
+            const origH = state.image ? state.image.height : state.video.videoHeight;
+
+            targetCtx.save();
+            targetCtx.translate(w * 0.5 + state.params.imageOffsetX, h * 0.5 + state.params.imageOffsetY);
+            targetCtx.rotate((state.params.imageRotation * Math.PI) / 180);
+            targetCtx.scale(state.params.imageScale, state.params.imageScale);
+            
+            targetCtx.drawImage(media, -origW * 0.5, -origH * 0.5, origW, origH);
+            targetCtx.restore();
+        }
+
+        function refreshOffscreenBuffer() {
+            if (!state.image && !state.video) return;
+            const w = state.offscreenCanvas.width;
+            const h = state.offscreenCanvas.height;
+            state.offscreenCtx.clearRect(0, 0, w, h);
+            drawTransformedMedia(state.offscreenCtx, w, h);
+        }
+
+        function setupCanvasDimensions() {
+            if (!state.image && !state.video) return;
+
+            const canvas = state.canvas;
+            const origW = state.image ? state.image.width : state.video.videoWidth;
+            const origH = state.image ? state.image.height : state.video.videoHeight;
+
+            const rad = (state.params.imageRotation * Math.PI) / 180;
+            const sin = Math.abs(Math.sin(rad));
+            const cos = Math.abs(Math.cos(rad));
+
+            const boundingW = Math.round(origW * cos + origH * sin);
+            const boundingH = Math.round(origW * sin + origH * cos);
+
+            canvas.width = boundingW;
+            canvas.height = boundingH;
+
+            state.offscreenCanvas.width = boundingW;
+            state.offscreenCanvas.height = boundingH;
+
+            if (!state.soupErosionCanvas) {
+                state.soupErosionCanvas = document.createElement('canvas');
+            }
+            state.soupErosionCanvas.width = boundingW;
+            state.soupErosionCanvas.height = boundingH;
+            state.soupErosionCtx = state.soupErosionCanvas.getContext('2d');
+
+            refreshOffscreenBuffer();
+        }
+
+        function refillSoupIngredients() {
+            state.dissolution = 0.0;
+            state.coverage = 0.0;
+            state.gridCount = 0;
+            state.hasTriggeredFullDissolution = false;
+            state.particles = [];
+
+            if (state.soupErosionCtx && state.offscreenCanvas) {
+                state.soupErosionCtx.clearRect(0, 0, state.soupErosionCanvas.width, state.soupErosionCanvas.height);
+            }
+
+            if ($('coverageBar')) {
+                $('coverageBar').className = 'bg-indigo-500 h-full transition-all duration-150';
+                $('coverageIndicatorDot').className = 'w-2.5 h-2.5 rounded-full bg-indigo-500';
+                $('coverageStateLabel').textContent = 'Active';
+                $('coverageStateLabel').className = 'text-emerald-400';
+            }
+
+            const banner = $('fullDissolutionBanner');
+            if (banner) {
+                banner.classList.add('opacity-0', 'pointer-events-none');
+            }
+
+            showToast('🍲 Refilled fresh ingredients into the hot pot!', 'success');
+        }
+
+        function triggerInstantFullDissolution() {
+            if (!state.offscreenCanvas || !state.soupErosionCtx) return;
+            const w = state.canvas.width;
+            const h = state.canvas.height;
+            const eCtx = state.soupErosionCtx;
+
+            eCtx.clearRect(0, 0, w, h);
+
+            const soupCx = w * state.params.soupX;
+            const soupCy = h * state.params.soupY;
+            const rx = w * state.params.soupRx;
+            const ry = h * state.params.soupRy;
+
+            const blockSz = Math.max(4, Math.round(state.params.particleSize * 1.2));
+
+            for (let gx = soupCx - rx; gx <= soupCx + rx; gx += blockSz) {
+                for (let gy = soupCy - ry; gy <= soupCy + ry; gy += blockSz) {
+                    const dx = (gx - soupCx) / rx;
+                    const dy = (gy - soupCy) / ry;
+                    if ((dx * dx + dy * dy) <= 0.98) {
+                        const jitterX = gx + (Math.random() - 0.5) * (blockSz * 1.8);
+                        const jitterY = gy + (Math.random() - 0.5) * (blockSz * 1.8);
+
+                        const cropSize = Math.max(3, blockSz);
+                        const srcX = Math.max(0, Math.min(state.offscreenCanvas.width - cropSize, Math.floor(jitterX)));
+                        const srcY = Math.max(0, Math.min(state.offscreenCanvas.height - cropSize, Math.floor(jitterY)));
+
+                        eCtx.save();
+                        eCtx.translate(gx, gy);
+                        eCtx.rotate((Math.random() - 0.5) * 1.2);
+
+                        eCtx.drawImage(
+                            state.offscreenCanvas,
+                            srcX, srcY, cropSize, cropSize,
+                            -blockSz / 2, -blockSz / 2, blockSz * 1.4, blockSz * 1.4
+                        );
+
+                        eCtx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+                        eCtx.lineWidth = 1;
+                        eCtx.strokeRect(-blockSz / 2, -blockSz / 2, blockSz * 1.4, blockSz * 1.4);
+                        eCtx.restore();
+                    }
+                }
+            }
+
+            state.particles = [];
+            const pSize = Math.max(4, state.params.particleSize);
+            const cols = Math.floor((w - 20) / pSize);
+            const rows = Math.floor((h - 20) / pSize);
+            const totalGridSlots = cols * rows;
+
+            for (let i = 0; i < Math.min(3000, totalGridSlots); i++) {
+                const col = i % cols;
+                const row = Math.floor(i / cols);
+                const targetX = 10 + col * pSize + pSize / 2;
+                const targetY = 10 + row * pSize + pSize / 2;
+
+                const angle = Math.random() * Math.PI * 2;
+                const rFrac = Math.sqrt(Math.random());
+                const sx = soupCx + Math.cos(angle) * rx * rFrac;
+                const sy = soupCy + Math.sin(angle) * ry * rFrac;
+                const rgb = samplePixelColor(sx, sy);
+
+                state.particles.push({
+                    sx: sx,
+                    sy: sy,
+                    x: targetX,
+                    y: targetY,
+                    targetX: targetX,
+                    targetY: targetY,
+                    isArrived: true,
+                    size: pSize,
+                    color: rgb,
+                    alpha: 0.95
+                });
+            }
+
+            state.gridCount = state.particles.length;
+            state.dissolution = 100.0;
+            state.coverage = 100.0;
+            state.hasTriggeredFullDissolution = true;
+            state.autoEmit = false;
+
+            if ($('coverageBar')) {
+                $('coverageBar').className = 'bg-rose-500 h-full transition-all duration-150';
+                $('coverageIndicatorDot').className = 'w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping';
+                $('coverageStateLabel').textContent = 'FOG GRID FULL';
+                $('coverageStateLabel').className = 'text-rose-400 font-bold';
+            }
+
+            const banner = $('fullDissolutionBanner');
+            if (banner) {
+                banner.classList.remove('opacity-0', 'pointer-events-none');
+            }
+
+            showToast('✨ Fog grid instantly filled!', 'success');
+        }
+
+        function addStirRipple(x, y) {
+            state.ripples.push({
+                x: x,
+                y: y,
+                radius: 5,
+                alpha: 0.8
+            });
+        }
+
+        function applySoupDissolutionEffect(ctx, w, h) {
+            if (!state.soupErosionCanvas) return;
+
+            const cx = w * state.params.soupX;
+            const cy = h * state.params.soupY;
+            const rx = w * state.params.soupRx;
+            const ry = h * state.params.soupRy;
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+            ctx.clip();
+            ctx.drawImage(state.soupErosionCanvas, 0, 0);
+            ctx.restore();
+        }
+
+        function samplePixelColor(x, y) {
+            const ctx = state.offscreenCtx;
+            const ix = Math.floor(Math.max(0, Math.min(x, state.offscreenCanvas.width - 1)));
+            const iy = Math.floor(Math.max(0, Math.min(y, state.offscreenCanvas.height - 1)));
+
+            try {
+                const pixel = ctx.getImageData(ix, iy, 1, 1).data;
+                return [pixel[0], pixel[1], pixel[2]];
+            } catch (e) {
+                return [234, 88, 12];
+            }
+        }
+
+        function isPointInSoup(x, y) {
+            const w = state.canvas.width;
+            const h = state.canvas.height;
+
+            const cx = w * state.params.soupX;
+            const cy = h * state.params.soupY;
+            const rx = w * state.params.soupRx;
+            const ry = h * state.params.soupRy;
+
+            const dx = (x - cx) / rx;
+            const dy = (y - cy) / ry;
+
+            return (dx * dx + dy * dy) <= 1.0;
+        }
+
+        function spawnFragmentsFromSoup(count = 1) {
+            const w = state.canvas.width;
+            const h = state.canvas.height;
+
+            const soupCx = w * state.params.soupX;
+            const soupCy = h * state.params.soupY;
+            const tempMultiplier = state.params.brothTemp / 100;
+
+            const pSize = Math.max(4, state.params.particleSize);
+            const cols = Math.floor((w - 20) / pSize);
+
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const rFrac = Math.sqrt(Math.random());
+                const sx = soupCx + Math.cos(angle) * (w * state.params.soupRx) * rFrac;
+                const sy = soupCy + Math.sin(angle) * (h * state.params.soupRy) * rFrac;
+
+                if (!isPointInSoup(sx, sy)) continue;
+
+                const rgb = samplePixelColor(sx, sy);
+
+                if (state.soupErosionCtx && state.offscreenCanvas) {
+                    const eCtx = state.soupErosionCtx;
+                    const blockSz = Math.max(4, Math.round(pSize * 1.2));
+                    
+                    const jitterX = (Math.random() - 0.5) * (blockSz * 1.5);
+                    const jitterY = (Math.random() - 0.5) * (blockSz * 1.5);
+                    const gridX = Math.round((sx + jitterX) / blockSz) * blockSz;
+                    const gridY = Math.round((sy + jitterY) / blockSz) * blockSz;
+
+                    const dx = (gridX - soupCx) / (w * state.params.soupRx);
+                    const dy = (gridY - soupCy) / (h * state.params.soupRy);
+                    if ((dx * dx + dy * dy) <= 0.96) {
+                        const cropSize = Math.max(3, blockSz);
+                        const srcX = Math.max(0, Math.min(state.offscreenCanvas.width - cropSize, Math.floor(sx)));
+                        const srcY = Math.max(0, Math.min(state.offscreenCanvas.height - cropSize, Math.floor(sy)));
+
+                        eCtx.save();
+                        eCtx.translate(gridX, gridY);
+                        eCtx.rotate((Math.random() - 0.5) * 0.8);
+                        
+                        eCtx.drawImage(
+                            state.offscreenCanvas,
+                            srcX, srcY, cropSize, cropSize,
+                            -blockSz / 2, -blockSz / 2, blockSz * 1.2, blockSz * 1.2
+                        );
+
+                        eCtx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+                        eCtx.lineWidth = 1;
+                        eCtx.strokeRect(-blockSz / 2, -blockSz / 2, blockSz * 1.2, blockSz * 1.2);
+                        eCtx.restore();
+
+                        state.dissolution = Math.min(100, state.dissolution + 0.05 * tempMultiplier);
+                    }
+                }
+
+                const gridIndex = state.particles.length;
+                const col = gridIndex % cols;
+                const row = Math.floor(gridIndex / cols);
+                const targetX = 10 + col * pSize + pSize / 2;
+                const targetY = 10 + row * pSize + pSize / 2;
+
+                if (targetY < h - 10) {
+                    state.particles.push({
+                        sx: sx,
+                        sy: sy,
+                        x: sx,
+                        y: sy,
+                        targetX: targetX,
+                        targetY: targetY,
+                        isArrived: false,
+                        size: pSize,
+                        color: rgb,
+                        alpha: 0.0
+                    });
+                    state.gridCount = state.particles.length;
+                    state.coverage = Math.min(100, (state.gridCount / (cols * Math.floor((h - 20) / pSize))) * 100);
+                }
+            }
+        }
+
+        function renderLoop() {
+            if (!state.canvas) return;
+            const ctx = state.ctx;
+            const w = state.canvas.width;
+            const h = state.canvas.height;
+
+            ctx.clearRect(0, 0, w, h);
+            if (state.image || state.video) {
+                drawTransformedMedia(ctx, w, h);
+                applySoupDissolutionEffect(ctx, w, h);
+                if (state.video) refreshOffscreenBuffer();
+            }
+
+            if (state.mouse.insideSoup && state.mouse.speed > 0.2) {
+                const energyGain = state.mouse.speed * 0.95;
+                state.stirEnergy = Math.min(100, state.stirEnergy + energyGain);
+
+                if (Math.random() > 0.3) {
+                    addStirRipple(state.mouse.x, state.mouse.y);
+                }
+            } else {
+                state.stirEnergy = Math.max(0, state.stirEnergy * 0.91 - 0.15);
+            }
+
+            state.mouse.speed *= 0.8;
+
+            if ($('stirEnergyText') && $('stirEnergyBar')) {
+                $('stirEnergyText').textContent = `${state.stirEnergy.toFixed(1)}%`;
+                $('stirEnergyBar').style.width = `${Math.min(100, state.stirEnergy)}%`;
+            }
+
+            if ($('coverageText') && $('coverageBar')) {
+                $('coverageText').textContent = `${state.coverage.toFixed(1)}% / 100.0%`;
+                $('coverageBar').style.width = `${Math.min(100, state.coverage)}%`;
+            }
+
+            if ($('dissolutionText') && $('dissolutionBar')) {
+                $('dissolutionText').textContent = `${state.dissolution.toFixed(1)}%`;
+                $('dissolutionBar').style.width = `${Math.min(100, state.dissolution)}%`;
+            }
+
+            if (state.coverage >= 100.0 && !state.hasTriggeredFullDissolution) {
+                state.hasTriggeredFullDissolution = true;
+                if ($('coverageBar')) {
+                    $('coverageBar').className = 'bg-rose-500 h-full transition-all duration-150';
+                    $('coverageIndicatorDot').className = 'w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping';
+                    $('coverageStateLabel').textContent = 'FOG GRID FULL';
+                    $('coverageStateLabel').className = 'text-rose-400 font-bold';
+                    $('autoEmitBtnText').textContent = 'Auto-Emit Grid';
+                    $('btnToggleAutoEmit').classList.remove('bg-rose-600');
+                    $('btnToggleAutoEmit').classList.add('bg-indigo-600');
+                }
+
+                const banner = $('fullDissolutionBanner');
+                if (banner) {
+                    banner.classList.remove('opacity-0', 'pointer-events-none');
+                }
+                showToast('✨ Top-left fog grid fully filled!', 'success');
+            }
+
+            for (let i = state.ripples.length - 1; i >= 0; i--) {
+                const rip = state.ripples[i];
+                rip.radius += 1.2;
+                rip.alpha -= 0.035;
+
+                if (rip.alpha <= 0) {
+                    state.ripples.splice(i, 1);
+                    continue;
+                }
+
+                ctx.save();
+                ctx.strokeStyle = `rgba(255, 255, 255, ${rip.alpha * 0.5})`;
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.arc(rip.x, rip.y, rip.radius, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            if (state.autoEmit) {
+                const rateWithTemp = Math.round(state.params.fragmentRate * (state.params.brothTemp / 100));
+                spawnFragmentsFromSoup(Math.max(1, rateWithTemp));
+            }
+
+            if (state.stirEnergy > 1.0 || state.mouse.insideSoup) {
+                const energyBonusRate = Math.round((state.stirEnergy / 100) * state.params.fragmentRate * 0.8 * (state.params.brothTemp / 100));
+                if (energyBonusRate > 0 || state.mouse.isDown) {
+                    spawnFragmentsFromSoup(Math.max(1, energyBonusRate));
+                }
+            }
+
+            const tempMultiplier = state.params.brothTemp / 100;
+            const fogOp = state.params.fogOpacity;
+
+            for (let i = 0; i < state.particles.length; i++) {
+                const p = state.particles[i];
+
+                if (!p.isArrived) {
+                    const dx = p.targetX - p.x;
+                    const dy = p.targetY - p.y;
+                    const dist = Math.hypot(dx, dy);
+
+                    if (dist < 2.0) {
+                        p.x = p.targetX;
+                        p.y = p.targetY;
+                        p.isArrived = true;
+                    } else {
+                        p.x += (dx / dist) * Math.min(dist, 14 * tempMultiplier);
+                        p.y += (dy / dist) * Math.min(dist, 14 * tempMultiplier);
+                    }
+
+                    if (p.alpha < 0.95) {
+                        p.alpha = Math.min(0.95, p.alpha + 0.06);
+                    }
+                }
+
+                ctx.save();
+                ctx.translate(p.x, p.y);
+
+                const [r, g, b] = p.color;
+                const pSize = p.size;
+                ctx.globalAlpha = p.alpha;
+
+                if (state.mode === 'pixel' && state.offscreenCanvas && state.offscreenCanvas.width > 0) {
+                    const cropSize = Math.max(2, Math.floor(pSize));
+                    const srcX = Math.max(0, Math.min(state.offscreenCanvas.width - cropSize, p.sx - cropSize / 2));
+                    const srcY = Math.max(0, Math.min(state.offscreenCanvas.height - cropSize, p.sy - cropSize / 2));
+                    
+                    // Draw original pixel source
+                    ctx.drawImage(
+                        state.offscreenCanvas,
+                        srcX, srcY, cropSize, cropSize,
+                        -pSize / 2, -pSize / 2, pSize, pSize
+                    );
+
+                    // Apply atmospheric fog filter colored based on original pixel color tint
+                    ctx.fillStyle = `rgba(${Math.round(r * 0.8 + 50)}, ${Math.round(g * 0.8 + 50)}, ${Math.round(b * 0.8 + 60)}, ${fogOp})`;
+                    ctx.fillRect(-pSize / 2, -pSize / 2, pSize, pSize);
+
+                    ctx.strokeStyle = `rgba(255, 255, 255, ${p.alpha * 0.35})`;
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(-pSize / 2, -pSize / 2, pSize, pSize);
+                } else {
+                    // Steam / Fog particle style blended with color filter
+                    const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, pSize * 1.5);
+                    grad.addColorStop(0, `rgba(${Math.round(r * 0.8 + 50)}, ${Math.round(g * 0.8 + 50)}, ${Math.round(b * 0.8 + 60)}, ${p.alpha * 0.85})`);
+                    grad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, pSize * 1.5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                ctx.restore();
+            }
+
+            if (state.showZones) {
+                renderZoneOverlays(ctx, w, h);
+            }
+
+            state.animationFrameId = requestAnimationFrame(renderLoop);
+        }
+
+        function renderZoneOverlays(ctx, w, h) {
+            ctx.save();
+
+            const soupCx = w * state.params.soupX;
+            const soupCy = h * state.params.soupY;
+            const soupRx = w * state.params.soupRx;
+            const soupRy = h * state.params.soupRy;
+
+            ctx.strokeStyle = '#ef4444';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([6, 6]);
+            ctx.beginPath();
+            ctx.ellipse(soupCx, soupCy, soupRx, soupRy, 0, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.fillStyle = 'rgba(239, 68, 68, 0.1)';
+            ctx.fill();
+
+            ctx.setLineDash([]);
+            ctx.fillStyle = '#ef4444';
+            ctx.beginPath();
+            ctx.arc(soupCx, soupCy, 12, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('⊕', soupCx, soupCy);
+
+            ctx.fillStyle = '#ef4444';
+            ctx.font = 'bold 11px sans-serif';
+            ctx.fillText('HOT POT SAMPLING AREA (Stir here)', soupCx, soupCy + soupRy + 18);
+
+            ctx.restore();
+        }
+
+        function setupCanvasInteractions() {
+            const canvas = state.canvas;
+
+            function getCanvasCoords(e) {
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+                return {
+                    x: (clientX - rect.left) * scaleX,
+                    y: (clientY - rect.top) * scaleY
+                };
+            }
+
+            function handleDown(e) {
+                const coords = getCanvasCoords(e);
+                const w = canvas.width;
+                const h = canvas.height;
+
+                const soupCx = w * state.params.soupX;
+                const soupCy = h * state.params.soupY;
+
+                const dSoup = Math.hypot(coords.x - soupCx, coords.y - soupCy);
+
+                if (dSoup < 30) {
+                    state.dragState.active = true;
+                    state.dragState.target = 'soup';
+                    canvas.style.cursor = 'grabbing';
+                } else {
+                    state.mouse.isDown = true;
+                    if (isPointInSoup(coords.x, coords.y)) {
+                        spawnFragmentsFromSoup(state.params.fragmentRate);
+                        addStirRipple(coords.x, coords.y);
+                    }
+                }
+            }
+
+            function handleMove(e) {
+                const coords = getCanvasCoords(e);
+                
+                const dx = coords.x - (state.mouse.prevX || coords.x);
+                const dy = coords.y - (state.mouse.prevY || coords.y);
+                state.mouse.speed = Math.hypot(dx, dy);
+                
+                state.mouse.x = coords.x;
+                state.mouse.y = coords.y;
+                state.mouse.prevX = coords.x;
+                state.mouse.prevY = coords.y;
+
+                const w = canvas.width;
+                const h = canvas.height;
+
+                if (state.dragState.active) {
+                    if (state.dragState.target === 'soup') {
+                        state.params.soupX = Math.max(0.1, Math.min(0.9, coords.x / w));
+                        state.params.soupY = Math.max(0.1, Math.min(0.9, coords.y / h));
+
+                        $('paramSoupX').value = Math.round(state.params.soupX * 100);
+                        $('valSoupX').textContent = `${Math.round(state.params.soupX * 100)}%`;
+                        $('paramSoupY').value = Math.round(state.params.soupY * 100);
+                        $('valSoupY').textContent = `${Math.round(state.params.soupY * 100)}%`;
+                    }
+                    return;
+                }
+
+                const inSoup = isPointInSoup(coords.x, coords.y);
+                state.mouse.insideSoup = inSoup;
+
+                if (inSoup) {
+                    canvas.style.cursor = 'pointer';
+                    const rgb = samplePixelColor(coords.x, coords.y);
+                    state.mouse.currentRgb = rgb;
+
+                    $('sampleHud').classList.remove('hidden');
+                    $('sampleColorSwatch').style.backgroundColor = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+                    $('sampleRgbText').textContent = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+
+                    spawnFragmentsFromSoup(4);
+                } else {
+                    canvas.style.cursor = 'default';
+                    $('sampleHud').classList.add('hidden');
+                }
+            }
+
+            function handleUp() {
+                state.dragState.active = false;
+                state.dragState.target = null;
+                state.mouse.isDown = false;
+                canvas.style.cursor = 'crosshair';
+            }
+
+            canvas.addEventListener('mousedown', handleDown);
+            canvas.addEventListener('mousemove', handleMove);
+            window.addEventListener('mouseup', handleUp);
+
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                handleDown(e);
+            }, { passive: false });
+
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                handleMove(e);
+            }, { passive: false });
+
+            window.addEventListener('touchend', handleUp);
+
+            canvas.addEventListener('mouseleave', () => {
+                $('sampleHud').classList.add('hidden');
+                state.mouse.insideSoup = false;
+            });
+        }
+
+        function toggleRecording() {
+            if (state.recording) {
+                state.mediaRecorder.stop();
+                state.recording = false;
+                $('btnRecordVideo').classList.remove('bg-red-600', 'animate-pulse');
+                $('btnRecordVideo').classList.add('bg-rose-600');
+                $('recordBtnText').textContent = 'Record Interaction';
+                showToast('Finalizing MP4/WebM video export...', 'info');
+            } else {
+                const stream = state.canvas.captureStream(30);
+                state.recordedChunks = [];
+
+                try {
+                    state.mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9' });
+                } catch (e) {
+                    state.mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+                }
+
+                state.mediaRecorder.ondataavailable = (e) => {
+                    if (e.data.size > 0) state.recordedChunks.push(e.data);
+                };
+
+                state.mediaRecorder.onstop = () => {
+                    const blob = new Blob(state.recordedChunks, { type: 'video/webm' });
+                    saveAs(blob, `hotpot_fog_grid_${Date.now()}.webm`);
+                    showToast('Interactive Video Downloaded!', 'success');
+                };
+
+                state.mediaRecorder.start();
+                state.recording = true;
+                $('btnRecordVideo').classList.remove('bg-rose-600');
+                $('btnRecordVideo').classList.add('bg-red-600', 'animate-pulse');
+                $('recordBtnText').textContent = 'Stop Recording...';
+                showToast('Recording canvas interaction...', 'warning');
+            }
+        }
+
+        function captureSnapshot() {
+            const prevZones = state.showZones;
+            state.showZones = false;
+
+            renderLoop();
+
+            state.canvas.toBlob((blob) => {
+                saveAs(blob, `hotpot_fog_frame_${Date.now()}.png`);
+                showToast('Exported high-res PNG snapshot', 'success');
+                state.showZones = prevZones;
+            }, 'image/png');
+        }
+
+        async function exportBatchZip() {
+            showToast('Packaging assets into ZIP archive...', 'info');
+            const zip = new JSZip();
+
+            const prevZones = state.showZones;
+            state.showZones = false;
+
+            const dataUrl = state.canvas.toDataURL('image/png');
+            const blob = await (await fetch(dataUrl)).blob();
+
+            zip.file('hotpot_fog_grid.png', blob);
+            zip.file('readme_studio_info.txt', 'Hot Pot Pixel Steam & Media Studio Export\nPixels extracted from soup with atmospheric fog color filter in top-left grid.');
+
+            const content = await zip.generateAsync({ type: 'blob' });
+            saveAs(content, 'hotpot_media_studio_export.zip');
+            showToast('ZIP archive downloaded successfully!', 'success');
+
+            state.showZones = prevZones;
+        }
+
+        function setupUIHandlers() {
+            state.canvas = $('studioCanvas');
+            state.ctx = state.canvas.getContext('2d');
+            state.offscreenCanvas = document.createElement('canvas');
+            state.offscreenCtx = state.offscreenCanvas.getContext('2d');
+
+            $('btnLoadDefaultHotpot').addEventListener('click', generateDefaultHotPot);
+            $('btnRefillSoup').addEventListener('click', refillSoupIngredients);
+            $('btnInstantDissolve').addEventListener('click', triggerInstantFullDissolution);
+
+            $('btnToggleZones').addEventListener('click', () => {
+                state.showZones = !state.showZones;
+                $('zoneToggleText').textContent = state.showZones ? 'Hide Zone Overlays' : 'Show Zone Overlays';
+            });
+
+            $('btnToggleAutoEmit').addEventListener('click', () => {
+                state.autoEmit = !state.autoEmit;
+                $('autoEmitBtnText').textContent = state.autoEmit ? 'Pause Grid' : 'Auto-Emit Grid';
+                $('btnToggleAutoEmit').classList.toggle('bg-rose-600', state.autoEmit);
+                $('btnToggleAutoEmit').classList.toggle('bg-indigo-600', !state.autoEmit);
+            });
+
+            $('btnClearFragments').addEventListener('click', () => {
+                refillSoupIngredients();
+                showToast('Cleared grid and restored hot pot ingredients', 'info');
+            });
+
+            $('btnRecordVideo').addEventListener('click', toggleRecording);
+            $('btnExportImage').addEventListener('click', captureSnapshot);
+            $('btnQuickSnapshot').addEventListener('click', captureSnapshot);
+            $('btnBatchZipExport').addEventListener('click', exportBatchZip);
+
+            $('btnImportLocal').addEventListener('click', () => $('fileInput').click());
+            $('fileInput').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const url = URL.createObjectURL(file);
+                if (file.type.startsWith('video/')) {
+                    const video = document.createElement('video');
+                    video.src = url;
+                    video.autoplay = true;
+                    video.loop = true;
+                    video.muted = true;
+                    video.onloadedmetadata = () => {
+                        state.video = video;
+                        state.image = null;
+                        video.play();
+                        setupCanvasDimensions();
+                        refillSoupIngredients();
+                        showToast(`Imported video asset: ${file.name}`, 'success');
+                    };
+                } else {
+                    const img = new Image();
+                    img.onload = () => {
+                        state.image = img;
+                        state.video = null;
+                        setupCanvasDimensions();
+                        refillSoupIngredients();
+                        showToast(`Imported image asset: ${file.name}`, 'success');
+                    };
+                    img.src = url;
+                }
+            });
+
+            $('btnImportUrl').addEventListener('click', () => $('urlModal').classList.remove('hidden'));
+            document.querySelectorAll('.btnCloseModal').forEach(btn => {
+                btn.addEventListener('click', () => $('urlModal').classList.add('hidden'));
+            });
+
+            $('btnConfirmUrlImport').addEventListener('click', () => {
+                const url = $('mediaUrlInput').value.trim();
+                if (!url) return;
+
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = () => {
+                    state.image = img;
+                    state.video = null;
+                    setupCanvasDimensions();
+                    refillSoupIngredients();
+                    $('urlModal').classList.add('hidden');
+                    showToast('Loaded remote image asset from URL', 'success');
+                };
+                img.onerror = () => {
+                    showToast('Failed to load image URL (CORS restricted)', 'error');
+                };
+                img.src = url;
+            });
+
+            const sliderMappings = [
+                ['paramFragmentRate', 'valFragmentRate', 'fragmentRate', ' / step'],
+                ['paramParticleSize', 'valParticleSize', 'particleSize', ' px'],
+                ['paramSoupX', 'valSoupX', 'soupX', '%', 0.01],
+                ['paramSoupY', 'valSoupY', 'soupY', '%', 0.01],
+                ['paramSoupRx', 'valSoupRx', 'soupRx', '%', 0.01],
+                ['paramSoupRy', 'valSoupRy', 'soupRy', '%', 0.01],
+            ];
+
+            sliderMappings.forEach(([inputId, labelId, paramKey, unit, multiplier = 1]) => {
+                $(inputId).addEventListener('input', (e) => {
+                    const val = parseFloat(e.target.value);
+                    if (multiplier !== 1) {
+                        state.params[paramKey] = val * multiplier;
+                        $(labelId).textContent = `${Math.round(val)}%`;
+                    } else {
+                        state.params[paramKey] = val;
+                        $(labelId).textContent = `${val}${unit}`;
+                    }
+                });
+            });
+
+            $('paramFogOpacity').addEventListener('input', (e) => {
+                const val = parseFloat(e.target.value);
+                state.params.fogOpacity = val / 100;
+                $('valFogOpacity').textContent = `${Math.round(val)}%`;
+            });
+
+            $('paramBrothTemp').addEventListener('input', (e) => {
+                const val = parseFloat(e.target.value);
+                state.params.brothTemp = val;
+                $('valBrothTemp').textContent = `${val}°C`;
+            });
+
+            $('paramOilDensity').addEventListener('input', (e) => {
+                const val = parseFloat(e.target.value);
+                state.params.oilDensity = val;
+                $('valOilDensity').textContent = `${val}%`;
+                generateDefaultHotPot();
+            });
+
+            $('btnResetBroth').addEventListener('click', () => {
+                state.params.brothTemp = 100;
+                state.params.oilDensity = 50;
+                $('paramBrothTemp').value = 100;
+                $('valBrothTemp').textContent = '100°C';
+                $('paramOilDensity').value = 50;
+                $('valOilDensity').textContent = '50%';
+                generateDefaultHotPot();
+                showToast('Reset broth temperature & oil density', 'info');
+            });
+
+            $('paramImageScale').addEventListener('input', (e) => {
+                const val = parseFloat(e.target.value);
+                state.params.imageScale = val;
+                $('valImageScale').textContent = `${Math.round(val * 100)}%`;
+                refreshOffscreenBuffer();
+            });
+
+            $('paramImageRotation').addEventListener('input', (e) => {
+                const val = parseFloat(e.target.value);
+                state.params.imageRotation = val;
+                $('valImageRotation').textContent = `${Math.round(val)}°`;
+                setupCanvasDimensions();
+            });
+
+            $('btnRotateCcw').addEventListener('click', () => {
+                state.params.imageRotation = (state.params.imageRotation - 90 + 360) % 360;
+                $('paramImageRotation').value = state.params.imageRotation;
+                $('valImageRotation').textContent = `${Math.round(state.params.imageRotation)}°`;
+                setupCanvasDimensions();
+            });
+
+            $('btnRotateCw').addEventListener('click', () => {
+                state.params.imageRotation = (state.params.imageRotation + 90) % 360;
+                $('paramImageRotation').value = state.params.imageRotation;
+                $('valImageRotation').textContent = `${Math.round(state.params.imageRotation)}°`;
+                setupCanvasDimensions();
+            });
+
+            $('btnFlipHoriz').addEventListener('click', () => {
+                state.params.imageRotation = (state.params.imageRotation + 180) % 360;
+                $('paramImageRotation').value = state.params.imageRotation;
+                $('valImageRotation').textContent = `${Math.round(state.params.imageRotation)}°`;
+                setupCanvasDimensions();
+            });
+
+            $('btnResetTransform').addEventListener('click', () => {
+                state.params.imageScale = 1.0;
+                state.params.imageRotation = 0;
+                state.params.imageOffsetX = 0;
+                state.params.imageOffsetY = 0;
+
+                $('paramImageScale').value = 1.0;
+                $('valImageScale').textContent = '100%';
+                $('paramImageRotation').value = 0;
+                $('valImageRotation').textContent = '0°';
+
+                setupCanvasDimensions();
+                showToast('Reset image size and rotation', 'info');
+            });
+
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.mode-btn').forEach(b => {
+                        b.classList.remove('bg-brand-600', 'text-white', 'active');
+                        b.classList.add('bg-dark-700', 'text-stone-300');
+                    });
+                    btn.classList.add('bg-brand-600', 'text-white', 'active');
+                    btn.classList.remove('bg-dark-700', 'text-stone-300');
+                    state.mode = btn.dataset.mode;
+                });
+            });
+
+            const dropzone = $('dropzone');
+            window.addEventListener('dragenter', (e) => {
+                e.preventDefault();
+                dropzone.classList.remove('opacity-0', 'pointer-events-none');
+            });
+
+            dropzone.addEventListener('dragover', (e) => e.preventDefault());
+            dropzone.addEventListener('dragleave', (e) => {
+                if (e.relatedTarget === null) {
+                    dropzone.classList.add('opacity-0', 'pointer-events-none');
+                }
+            });
+
+            dropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropzone.classList.add('opacity-0', 'pointer-events-none');
+
+                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    const file = e.dataTransfer.files[0];
+                    const url = URL.createObjectURL(file);
+                    const img = new Image();
+                    img.onload = () => {
+                        state.image = img;
+                        state.video = null;
+                        setupCanvasDimensions();
+                        refillSoupIngredients();
+                        showToast(`Dropped asset loaded: ${file.name}`, 'success');
+                    };
+                    img.src = url;
+                }
+            });
+
+            $('btnResetParams').addEventListener('click', () => {
+                state.params.fragmentRate = 20;
+                state.params.particleSize = 8;
+                state.params.fogOpacity = 0.45;
+                state.params.soupX = 0.50;
+                state.params.soupY = 0.58;
+                state.params.soupRx = 0.35;
+                state.params.soupRy = 0.20;
+
+                $('paramFragmentRate').value = 20;
+                $('valFragmentRate').textContent = '20 / step';
+                $('paramParticleSize').value = 8;
+                $('valParticleSize').textContent = '8 px';
+                $('paramFogOpacity').value = 45;
+                $('valFogOpacity').textContent = '45%';
+
+                $('paramSoupX').value = 50;
+                $('valSoupX').textContent = '50%';
+                $('paramSoupY').value = 58;
+                $('valSoupY').textContent = '58%';
+                $('paramSoupRx').value = 35;
+                $('valSoupRx').textContent = '35%';
+                $('paramSoupRy').value = 20;
+                $('valSoupRy').textContent = '20%';
+
+                showToast('Reset default parameters & zone coordinates', 'info');
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            setupUIHandlers();
+            setupCanvasInteractions();
+            lucide.createIcons();
+
+            generateDefaultHotPot();
+            renderLoop();
+        });
+    </script>
+</body>
+</html>
